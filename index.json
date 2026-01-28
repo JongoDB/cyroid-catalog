@@ -1,0 +1,377 @@
+{
+  "catalog": {
+    "name": "Official CYROID Catalog",
+    "version": "0.1.0",
+    "maintainer": "JongoDB",
+    "generated_at": "2026-01-28T21:48:40.316745+00:00"
+  },
+  "items": [
+    {
+      "id": "red-team-training-lab",
+      "type": "blueprint",
+      "name": "Red Team Training Lab",
+      "description": "Comprehensive red team training environment featuring:\n- Kali Attack Box with pre-installed tools (Metasploit, Impacket, CrackMapExec, etc.)\n- WordPress target with SQL injection vulnerabilities\n- Samba Domain Controller\n- Internal file server with sensitive data\n- Victim workstation for BeEF exploitation\n- C2 redirectors for infrastructure training\n\nAttack paths: SQLi -> Credential theft -> Lateral movement -> Domain compromise",
+      "tags": [
+        "red-team",
+        "penetration-testing",
+        "training"
+      ],
+      "version": "1.0",
+      "path": "blueprints/red-team-training-lab",
+      "requires_images": [
+        "kali-attack",
+        "redteam-lab-wordpress",
+        "samba-dc",
+        "redteam-lab-fileserver",
+        "redteam-lab-workstation"
+      ],
+      "includes_msel": true,
+      "includes_content": false,
+      "checksum": "sha256:62e54da9d09a2a2e"
+    },
+    {
+      "id": "apt-intrusion",
+      "type": "scenario",
+      "name": "APT Intrusion",
+      "description": "Simulates an Advanced Persistent Threat (APT) intrusion from initial\nspearphishing through to data exfiltration. Covers the full kill chain\nincluding C2 establishment, Active Directory reconnaissance, privilege\nescalation, and data staging.",
+      "tags": [],
+      "version": "1.0",
+      "path": "scenarios/apt-intrusion.yaml",
+      "checksum": "sha256:cbda538088ea98ce"
+    },
+    {
+      "id": "incident-response-drill",
+      "type": "scenario",
+      "name": "Incident Response Drill",
+      "description": "Blue team exercise that plants indicators of compromise across systems.\nParticipants must identify and document all planted artifacts within\nthe time limit. Tests detection capabilities and IR procedures.",
+      "tags": [],
+      "version": "1.0",
+      "path": "scenarios/incident-response-drill.yaml",
+      "checksum": "sha256:cbada58accc5a417"
+    },
+    {
+      "id": "insider-threat",
+      "type": "scenario",
+      "name": "Insider Threat",
+      "description": "Simulates a malicious insider scenario where an employee with legitimate\naccess exfiltrates sensitive data. Covers after-hours access, unauthorized\ndata access, data staging, and exfiltration attempts.",
+      "tags": [],
+      "version": "1.0",
+      "path": "scenarios/insider-threat.yaml",
+      "checksum": "sha256:5e04629aa89b6d1d"
+    },
+    {
+      "id": "ransomware-attack",
+      "type": "scenario",
+      "name": "Ransomware Attack",
+      "description": "Simulates a ransomware attack starting from initial phishing payload\nthrough to file encryption and ransom note deployment. Covers initial\naccess, persistence, discovery, credential access, lateral movement,\nand impact phases of the MITRE ATT&CK framework.",
+      "tags": [],
+      "version": "1.0",
+      "path": "scenarios/ransomware-attack.yaml",
+      "checksum": "sha256:fde2b73c3f3a894d"
+    },
+    {
+      "id": "kali-attack",
+      "type": "image",
+      "name": "Kali Attack Box",
+      "description": "Kali Linux attack platform with pre-installed penetration testing tools (Metasploit, Impacket, CrackMapExec, etc.)",
+      "tags": [
+        "offensive"
+      ],
+      "version": "1.0",
+      "path": "images/kali-attack",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/kali-attack:latest",
+      "checksum": "sha256:7fee85acdaaf4233"
+    },
+    {
+      "id": "redteam-lab-fileserver",
+      "type": "image",
+      "name": "SMB File Server",
+      "description": "Samba file server with planted sensitive data (employee SSNs, passwords, trade secrets) for lateral movement training.",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "images/redteam-lab-fileserver",
+      "arch": "both",
+      "docker_tag": "cyroid/redteam-lab-fileserver:latest",
+      "checksum": "sha256:f0169df470588a0f"
+    },
+    {
+      "id": "redteam-lab-wordpress",
+      "type": "image",
+      "name": "Vulnerable WordPress Server",
+      "description": "WordPress with intentionally vulnerable employee portal plugin featuring SQL injection and XSS vulnerabilities.",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "images/redteam-lab-wordpress",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/redteam-lab-wordpress:latest",
+      "checksum": "sha256:b993b90073e0579f"
+    },
+    {
+      "id": "redteam-lab-workstation",
+      "type": "image",
+      "name": "Victim Workstation",
+      "description": "Simulated employee workstation with automated browsing behavior for BeEF hook triggering and XSS exploitation training.",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "images/redteam-lab-workstation",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/redteam-lab-workstation:latest",
+      "checksum": "sha256:f85510681a8a8bb1"
+    },
+    {
+      "id": "samba-dc",
+      "type": "image",
+      "name": "Samba Active Directory Domain Controller",
+      "description": "Ubuntu-based Samba AD DC with DNS, LDAP, and user provisioning. ARM-compatible alternative to Windows AD.",
+      "tags": [
+        "infrastructure"
+      ],
+      "version": "1.0",
+      "path": "images/samba-dc",
+      "arch": "both",
+      "docker_tag": "cyroid/samba-dc:latest",
+      "checksum": "sha256:a674206cba30660a"
+    },
+    {
+      "id": "windows-server-2019",
+      "type": "template",
+      "name": "Windows Server 2019",
+      "description": "Windows Server 2019 Standard as a full virtual machine.\nSuitable for Active Directory, file servers, and legacy Windows server workloads.",
+      "tags": [
+        "server"
+      ],
+      "version": "1.0",
+      "path": "templates/windows/windows-server-2019.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:f598fc910cc28a06"
+    },
+    {
+      "id": "windows-server-2022",
+      "type": "template",
+      "name": "Windows Server 2022",
+      "description": "Windows Server 2022 Standard as a full virtual machine.\nSuitable for file servers, IIS, SQL Server, and general Windows server workloads.",
+      "tags": [
+        "server"
+      ],
+      "version": "1.0",
+      "path": "templates/windows/windows-server-2022.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:f1a1607c1bfd8aae"
+    },
+    {
+      "id": "windows-server-2025",
+      "type": "template",
+      "name": "Windows Server 2025",
+      "description": "Windows Server 2025 Standard as a full virtual machine.\nLatest Windows Server with improved security and management features.",
+      "tags": [
+        "server"
+      ],
+      "version": "1.0",
+      "path": "templates/windows/windows-server-2025.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:1eb71838a2f31d7d"
+    },
+    {
+      "id": "windows-dc-2022",
+      "type": "template",
+      "name": "Windows DC 2022",
+      "description": "Windows Server 2022 Domain Controller",
+      "tags": [
+        "infrastructure"
+      ],
+      "version": "1.0",
+      "path": "templates/windows/windows-dc-2022.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:fc9cc4b94e0b8a49"
+    },
+    {
+      "id": "ubuntu-server-22.04",
+      "type": "template",
+      "name": "Ubuntu Server 22.04",
+      "description": "Ubuntu Server 22.04 LTS as a full QEMU virtual machine.\nSuitable for server workloads, web servers, databases, and services.",
+      "tags": [
+        "server"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/ubuntu-server-22.04.yaml",
+      "arch": "both",
+      "checksum": "sha256:536d3fdd91e9c1ce"
+    },
+    {
+      "id": "ubuntu-server-24.04",
+      "type": "template",
+      "name": "Ubuntu Server 24.04",
+      "description": "Ubuntu Server 24.04 LTS as a lightweight container.\nUses linuxserver webtop for terminal/desktop access.\nSuitable for web servers, API servers, and general Linux workloads.",
+      "tags": [
+        "server"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/ubuntu-server-24.04.yaml",
+      "arch": "both",
+      "checksum": "sha256:74d878016ad33657"
+    },
+    {
+      "id": "ubuntu-desktop-22.04",
+      "type": "template",
+      "name": "Ubuntu Desktop 22.04",
+      "description": "Ubuntu Desktop 22.04 LTS with GNOME desktop environment.\nSuitable for user workstations and graphical applications.",
+      "tags": [
+        "desktop"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/ubuntu-desktop-22.04.yaml",
+      "arch": "both",
+      "checksum": "sha256:47e958f3c7cc7cba"
+    },
+    {
+      "id": "kali-desktop",
+      "type": "template",
+      "name": "Kali Desktop",
+      "description": "Kali Linux with full desktop environment and penetration testing tools.\nIdeal for red team exercises and security training.",
+      "tags": [
+        "offensive"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/kali-desktop.yaml",
+      "arch": "both",
+      "checksum": "sha256:285bc7fddc13faef"
+    },
+    {
+      "id": "kali-attack",
+      "type": "template",
+      "name": "Kali Attack Box",
+      "description": "Kali Linux configured as an attack platform with common tools pre-installed.\nUses KasmVNC for fast, native container-based desktop access.\nOptimized for red team operations and penetration testing scenarios.",
+      "tags": [
+        "offensive"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/kali-attack.yaml",
+      "arch": "both",
+      "checksum": "sha256:58cef748d5e61e7a"
+    },
+    {
+      "id": "security-onion",
+      "type": "template",
+      "name": "Security Onion 2.4",
+      "description": "Security monitoring and threat hunting platform",
+      "tags": [
+        "security"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/security-onion.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:02859c7f2f0ed7b5"
+    },
+    {
+      "id": "pfsense",
+      "type": "template",
+      "name": "pfSense 2.7",
+      "description": "pfSense firewall/router",
+      "tags": [
+        "network"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/pfsense.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:2b7766017ee1a894"
+    },
+    {
+      "id": "samba-dc",
+      "type": "template",
+      "name": "Samba DC",
+      "description": "ARM-compatible AD DC using Samba",
+      "tags": [
+        "infrastructure"
+      ],
+      "version": "1.0",
+      "path": "templates/linux/samba-dc.yaml",
+      "arch": "both",
+      "checksum": "sha256:f8b3678a75d685c2"
+    },
+    {
+      "id": "vyos-router",
+      "type": "template",
+      "name": "VyOS Router",
+      "description": "VyOS router for internal network segments",
+      "tags": [
+        "network"
+      ],
+      "version": "1.0",
+      "path": "templates/network/vyos-router.yaml",
+      "arch": "both",
+      "checksum": "sha256:ba669334ed9a5c0f"
+    },
+    {
+      "id": "redteam-kali-attack",
+      "type": "template",
+      "name": "Red Team - Kali Attack Box",
+      "description": "Kali Attack Box with pre-installed red team tools",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "templates/red-team/kali-attack-box.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:6e9f49350c5a478c"
+    },
+    {
+      "id": "redteam-wordpress-target",
+      "type": "template",
+      "name": "Red Team - WordPress Target",
+      "description": "WordPress with SQLi/XSS vulnerabilities",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "templates/red-team/wordpress-target.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:3ba1dd11af9e829c"
+    },
+    {
+      "id": "redteam-file-server",
+      "type": "template",
+      "name": "Red Team - File Server",
+      "description": "Samba file server with sensitive data",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "templates/red-team/file-server.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:3562d26504b3bf64"
+    },
+    {
+      "id": "redteam-victim-workstation",
+      "type": "template",
+      "name": "Red Team - Victim Workstation",
+      "description": "Employee workstation for BeEF exploitation",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "templates/red-team/victim-workstation.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:e1deab086ecd6600"
+    },
+    {
+      "id": "redteam-redirector",
+      "type": "template",
+      "name": "Red Team - Redirector",
+      "description": "Lightweight C2 redirector",
+      "tags": [
+        "red-team"
+      ],
+      "version": "1.0",
+      "path": "templates/red-team/redirector.yaml",
+      "arch": "both",
+      "checksum": "sha256:34bfca248d0a2573"
+    }
+  ]
+}

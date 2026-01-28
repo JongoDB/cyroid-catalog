@@ -1,0 +1,5 @@
+name: SMB File Server
+tag: "cyroid/redteam-lab-fileserver:latest"
+description: Samba file server with planted sensitive data (employee SSNs, passwords, trade secrets) for lateral movement training.
+arch: both
+category: red-team

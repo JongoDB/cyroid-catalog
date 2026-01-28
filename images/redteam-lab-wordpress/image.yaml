@@ -1,0 +1,5 @@
+name: Vulnerable WordPress Server
+tag: "cyroid/redteam-lab-wordpress:latest"
+description: WordPress with intentionally vulnerable employee portal plugin featuring SQL injection and XSS vulnerabilities.
+arch: x86_64
+category: red-team

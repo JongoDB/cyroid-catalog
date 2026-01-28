@@ -1,0 +1,5 @@
+name: Victim Workstation
+tag: "cyroid/redteam-lab-workstation:latest"
+description: Simulated employee workstation with automated browsing behavior for BeEF hook triggering and XSS exploitation training.
+arch: x86_64
+category: red-team

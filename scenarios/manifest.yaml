@@ -1,0 +1,12 @@
+# CYROID Catalog - Scenarios Manifest
+
+version: 1
+scenarios:
+  - id: ransomware-attack
+    file: ransomware-attack.yaml
+  - id: apt-intrusion
+    file: apt-intrusion.yaml
+  - id: insider-threat
+    file: insider-threat.yaml
+  - id: incident-response-drill
+    file: incident-response-drill.yaml
