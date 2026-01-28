@@ -1,0 +1,5 @@
+name: Official CYROID Catalog
+version: "0.1.0"
+maintainer: JongoDB
+description: Training content catalog for CYROID - range blueprints, scenarios, VM images, and training materials.
+url: https://github.com/JongoDB/cyroid-catalog
