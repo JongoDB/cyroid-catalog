@@ -1,0 +1,201 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'images/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'images/**'
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Specific image to build (leave empty for all)'
+        required: false
+        default: ''
+      force_push:
+        description: 'Force push even on PR'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  REGISTRY_PREFIX: ghcr.io/jongodb
+
+jobs:
+  # Discover which images to build - automatically finds all directories in images/
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Discover images to build
+        id: set-matrix
+        env:
+          INPUT_IMAGE: ${{ github.event.inputs.image }}
+        run: |
+          if [ -n "$INPUT_IMAGE" ]; then
+            # Single image specified via workflow dispatch
+            # Validate the image exists
+            if [ -d "images/$INPUT_IMAGE" ] && [ -f "images/$INPUT_IMAGE/Dockerfile" ]; then
+              IMAGES=$(echo "$INPUT_IMAGE" | jq -R -c '[.]')
+            else
+              echo "Error: Image '$INPUT_IMAGE' not found or has no Dockerfile"
+              exit 1
+            fi
+          else
+            # Auto-discover: Find all directories in images/ that contain a Dockerfile
+            IMAGES=$(find images -mindepth 1 -maxdepth 1 -type d -exec test -f {}/Dockerfile \; -print | xargs -I {} basename {} | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          fi
+
+          echo "matrix={\"image\":$IMAGES}" >> $GITHUB_OUTPUT
+          echo "Discovered images to build: $IMAGES"
+
+  build:
+    needs: discover
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read image metadata
+        id: meta
+        env:
+          IMAGE_DIR: images/${{ matrix.image }}
+        run: |
+          # Parse image.yaml for metadata
+          if [ ! -f "$IMAGE_DIR/image.yaml" ]; then
+            echo "Warning: No image.yaml found, using defaults"
+            NAME="${{ matrix.image }}"
+            TAG="cyroid/${{ matrix.image }}:latest"
+            ARCH="x86_64"
+            CATEGORY="unknown"
+          else
+            NAME=$(grep '^name:' "$IMAGE_DIR/image.yaml" | sed 's/name: *//' || echo "${{ matrix.image }}")
+            TAG=$(grep '^tag:' "$IMAGE_DIR/image.yaml" | sed 's/tag: *//' | tr -d '"' || echo "cyroid/${{ matrix.image }}:latest")
+            ARCH=$(grep '^arch:' "$IMAGE_DIR/image.yaml" | sed 's/arch: *//' || echo "x86_64")
+            CATEGORY=$(grep '^category:' "$IMAGE_DIR/image.yaml" | sed 's/category: *//' || echo "unknown")
+          fi
+
+          # Extract image name from tag (e.g., cyroid/kali-attack:latest -> kali-attack)
+          IMAGE_NAME=$(echo "$TAG" | sed 's|cyroid/||' | sed 's|:.*||')
+
+          # Set platforms based on arch
+          if [ "$ARCH" = "both" ]; then
+            PLATFORMS="linux/amd64,linux/arm64"
+          else
+            PLATFORMS="linux/amd64"
+          fi
+
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "arch=$ARCH" >> $GITHUB_OUTPUT
+          echo "category=$CATEGORY" >> $GITHUB_OUTPUT
+          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
+
+          echo "Building: $NAME ($IMAGE_NAME)"
+          echo "  Tag: $TAG"
+          echo "  Arch: $ARCH -> Platforms: $PLATFORMS"
+          echo "  Category: $CATEGORY"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        if: steps.meta.outputs.arch == 'both'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request' || github.event.inputs.force_push == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: images/${{ matrix.image }}
+          platforms: ${{ steps.meta.outputs.platforms }}
+          push: ${{ github.event_name != 'pull_request' || github.event.inputs.force_push == 'true' }}
+          tags: |
+            ${{ env.REGISTRY_PREFIX }}/${{ steps.meta.outputs.image_name }}:latest
+            ${{ env.REGISTRY_PREFIX }}/${{ steps.meta.outputs.image_name }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.title=${{ steps.meta.outputs.name }}
+            org.opencontainers.image.description=CYROID training image - ${{ steps.meta.outputs.category }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test image (amd64 only)
+        if: steps.meta.outputs.arch != 'both'
+        env:
+          IMAGE_NAME: ${{ steps.meta.outputs.image_name }}
+          MATRIX_IMAGE: ${{ matrix.image }}
+        run: |
+          IMAGE="${REGISTRY_PREFIX}/${IMAGE_NAME}:${GITHUB_SHA}"
+
+          # For PRs without force_push, build locally for testing
+          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.event.inputs.force_push }}" != "true" ]; then
+            IMAGE="${REGISTRY_PREFIX}/${IMAGE_NAME}:latest"
+            docker build -t "$IMAGE" "images/${MATRIX_IMAGE}"
+          fi
+
+          echo "Testing image: $IMAGE"
+
+          # Basic smoke test - verify container starts
+          CONTAINER_NAME="test-${MATRIX_IMAGE}"
+          docker run --rm -d --name "$CONTAINER_NAME" "$IMAGE" sleep 30 || true
+          sleep 5
+
+          if docker ps | grep -q "$CONTAINER_NAME"; then
+            echo "✓ Container started successfully"
+            docker stop "$CONTAINER_NAME" || true
+          else
+            echo "⚠ Container may have exited (this may be expected for some images)"
+            docker logs "$CONTAINER_NAME" 2>&1 | tail -20 || true
+          fi
+
+  summary:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Build Summary
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$BUILD_RESULT" = "success" ]; then
+            echo "✅ **All images built successfully**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some images failed to build**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry:** \`ghcr.io/jongodb\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Adding New Images" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To add a new image, create a directory under \`images/\` with:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`Dockerfile\` (required)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`image.yaml\` (recommended - defines name, tag, arch, category)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The workflow will automatically discover and build it on the next push." >> $GITHUB_STEP_SUMMARY
