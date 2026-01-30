@@ -13,7 +13,7 @@ cyroid-catalog/
 ├── blueprints/           # Self-contained range packages
 ├── scenarios/            # Standalone scenario timelines
 ├── images/               # Shared Dockerfile projects
-├── templates/            # VM template definitions
+├── base-images/          # VM base image definitions
 └── scripts/              # Index generation tooling
 ```
 

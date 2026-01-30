@@ -155,28 +155,28 @@ def scan_images() -> list[dict]:
     return items
 
 
-def scan_templates() -> list[dict]:
+def scan_base_images() -> list[dict]:
     items = []
-    templates_dir = REPO_ROOT / "templates"
-    manifest_file = templates_dir / "manifest.yaml"
+    base_images_dir = REPO_ROOT / "base-images"
+    manifest_file = base_images_dir / "manifest.yaml"
     if not manifest_file.exists():
         return items
 
     manifest = load_yaml(manifest_file)
     for tmpl in manifest.get("templates", []):
-        tmpl_file = templates_dir / tmpl.get("file", "")
+        tmpl_file = base_images_dir / tmpl.get("file", "")
         if not tmpl_file.exists():
             continue
 
         tmpl_data = load_yaml(tmpl_file)
         items.append({
             "id": tmpl.get("seed_id", tmpl_file.stem),
-            "type": "template",
+            "type": "base_image",
             "name": tmpl_data.get("name", tmpl.get("seed_id", "")),
             "description": tmpl.get("description", tmpl_data.get("description", "")).strip(),
             "tags": [tmpl.get("category", "")],
             "version": "1.0",
-            "path": f"templates/{tmpl.get('file', '')}",
+            "path": f"base-images/{tmpl.get('file', '')}",
             "arch": tmpl.get("arch", "both"),
             "checksum": file_checksum(tmpl_file),
         })
@@ -192,7 +192,7 @@ def main():
     items.extend(scan_blueprints())
     items.extend(scan_scenarios())
     items.extend(scan_images())
-    items.extend(scan_templates())
+    items.extend(scan_base_images())
 
     index = {
         "catalog": {
