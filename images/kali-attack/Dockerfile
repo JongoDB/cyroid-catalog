@@ -36,7 +36,7 @@ RUN apt-get update --allow-insecure-repositories && \
     # Exploitation Frameworks
     metasploit-framework exploitdb \
     # Active Directory Tools
-    evil-winrm impacket-scripts python3-impacket smbclient smbmap \
+    evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec \
     # Password Attacks (hydra/medusa for online attacks only)
     hydra medusa \
     # Wordlists - just the base package with dirb lists for gobuster
@@ -81,9 +81,7 @@ RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe -O /opt/tools/peas/winpeas64.exe && \
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx86.exe -O /opt/tools/peas/winpeas32.exe && \
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64 -O /opt/tools/peas/linpeas_amd64 && \
-    chmod +x /opt/tools/peas/linpeas.sh /opt/tools/peas/linpeas_amd64 && \
-    # NetExec (CrackMapExec successor)
-    pip3 install --break-system-packages netexec || true
+    chmod +x /opt/tools/peas/linpeas.sh /opt/tools/peas/linpeas_amd64
 
 # === LAYER 3: Config files + wordlist prep in one RUN ===
 RUN if [ -f /usr/share/wordlists/rockyou.txt.gz ]; then gunzip -k /usr/share/wordlists/rockyou.txt.gz || true; fi && \
