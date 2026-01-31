@@ -74,36 +74,38 @@ vms:
     position_x: 400
     position_y: 200
 
-  # Internal network - Samba Domain Controller
-  - hostname: dc01
-    base_image_tag: "cyroid/samba-dc:latest"
-    network_name: internal
-    ip_address: "172.16.2.10"
-    cpu: 2
-    ram_mb: 2048
-    disk_gb: 20
-    position_x: 700
-    position_y: 100
-
   # Internal network - Samba File Server with sensitive data
+  # NOTE: fileserver at .10 so credential reuse attack works per walkthrough
   - hostname: fileserver
     base_image_tag: "cyroid/redteam-lab-fileserver:latest"
     network_name: internal
-    ip_address: "172.16.2.20"
+    ip_address: "172.16.2.10"
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 700
+    position_y: 100
+
+  # Internal network - Victim Workstation (simulated browsing)
+  - hostname: ws01
+    base_image_tag: "cyroid/redteam-lab-workstation:latest"
+    network_name: internal
+    ip_address: "172.16.2.11"
     cpu: 1
     ram_mb: 1024
     disk_gb: 10
     position_x: 700
     position_y: 200
 
-  # Internal network - Victim Workstation (simulated browsing)
-  - hostname: ws01
-    base_image_tag: "cyroid/redteam-lab-workstation:latest"
+  # Internal network - Samba Domain Controller
+  # NOTE: DC at .12 to match walkthrough network diagram
+  - hostname: dc01
+    base_image_tag: "cyroid/samba-dc:latest"
     network_name: internal
-    ip_address: "172.16.2.30"
-    cpu: 1
-    ram_mb: 1024
-    disk_gb: 10
+    ip_address: "172.16.2.12"
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
     position_x: 700
     position_y: 300
 
