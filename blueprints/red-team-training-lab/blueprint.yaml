@@ -244,7 +244,7 @@ walkthrough:
             Let's find hidden pages using gobuster:
 
             ```bash
-            gobuster dir -u http://172.16.0.100 -w /usr/share/wordlists/dirb/common.txt
+            gobuster dir -u http://172.16.0.100 -w /usr/share/dirbuster/wordlists/directory-list-2.3-small.txt
             ```
 
             ### Expected Output
