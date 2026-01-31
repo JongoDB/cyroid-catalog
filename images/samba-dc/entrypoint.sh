@@ -49,22 +49,23 @@ if [ ! -f /var/lib/samba/private/secrets.keytab ]; then
     if [ "${CREATE_TEST_USERS}" = "true" ]; then
         echo "Creating test users..."
 
-        samba-tool user create john.doe "Password123!" \
-            --given-name="John" --surname="Doe" \
-            --mail-address="john.doe@$(echo ${SAMBA_REALM} | tr '[:upper:]' '[:lower:]')" \
+        # Create users matching the red team training lab walkthrough
+        samba-tool user create jsmith "Summer2024" \
+            --given-name="John" --surname="Smith" \
+            --mail-address="jsmith@$(echo ${SAMBA_REALM} | tr '[:upper:]' '[:lower:]')" \
             || true
 
-        samba-tool user create jane.smith "Password123!" \
-            --given-name="Jane" --surname="Smith" \
-            --mail-address="jane.smith@$(echo ${SAMBA_REALM} | tr '[:upper:]' '[:lower:]')" \
+        samba-tool user create mwilliams "Welcome123" \
+            --given-name="Mary" --surname="Williams" \
+            --mail-address="mwilliams@$(echo ${SAMBA_REALM} | tr '[:upper:]' '[:lower:]')" \
             || true
 
-        samba-tool user create svc.backup "SvcPassword123!" \
+        samba-tool user create svc_backup "Backup2024" \
             --given-name="Backup" --surname="Service" \
-            --description="Backup service account" \
+            --description="Backup service account with file server access" \
             || true
 
-        echo "Test users created: john.doe, jane.smith, svc.backup"
+        echo "Test users created: jsmith, mwilliams, svc_backup"
     fi
 
 else

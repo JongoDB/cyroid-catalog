@@ -30,10 +30,12 @@ LABEL version="1.0.0"
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Default configuration (override with environment variables)
-ENV SAMBA_REALM=CYROID.LOCAL
-ENV SAMBA_DOMAIN=CYROID
-ENV SAMBA_ADMIN_PASS=CyroidAdmin123!
+# Defaults match the Red Team Training Lab walkthrough (Acme Widgets story)
+ENV SAMBA_REALM=ACMEWIDGETS.LOCAL
+ENV SAMBA_DOMAIN=ACMEWIDGETS
+ENV SAMBA_ADMIN_PASS=Adm1n2024
 ENV SAMBA_DNS_FORWARDER=8.8.8.8
+ENV CREATE_TEST_USERS=true
 
 # Install Samba and dependencies
 RUN apt-get update && apt-get install -y \
