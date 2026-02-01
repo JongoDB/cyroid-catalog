@@ -15,10 +15,6 @@
 ARG BASE_TAG="1.15.0"
 FROM kasmweb/kali-rolling-desktop:${BASE_TAG}
 
-LABEL maintainer="CYROID <https://github.com/cyroid>" \
-      description="CYROID Kali Attack Box - Full offensive security toolkit" \
-      version="1.1.0"
-
 USER root
 ENV DEBIAN_FRONTEND=noninteractive \
     HOME=/home/kasm-default-profile \
