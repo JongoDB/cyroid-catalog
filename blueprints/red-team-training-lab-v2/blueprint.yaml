@@ -1,0 +1,101 @@
+# CYROID Red Team Training Lab v2 Blueprint
+seed_id: red-team-training-lab-v2
+name: Red Team Training Lab v2
+description: |
+  Comprehensive red team training environment featuring:
+  - Kali Attack Box with pre-installed tools (Metasploit, Impacket, CrackMapExec, etc.)
+  - WordPress target with SQL injection vulnerabilities
+  - Samba Domain Controller
+  - Internal file server with sensitive data
+  - Victim workstation for BeEF exploitation
+  - C2 redirectors for infrastructure training
+  
+  Attack paths: SQLi -> Credential theft -> Lateral movement -> Domain compromise
+
+base_subnet_prefix: "172.16"
+
+networks:
+  - name: internet
+    subnet: "172.16.0.0/24"
+    gateway: "172.16.0.1"
+    is_isolated: false
+
+  - name: dmz
+    subnet: "172.16.1.0/24"
+    gateway: "172.16.1.1"
+    is_isolated: true
+
+  - name: internal
+    subnet: "172.16.2.0/24"
+    gateway: "172.16.2.1"
+    is_isolated: true
+
+vms:
+  - hostname: kali
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: internet
+        ip_address: "172.16.0.10"
+        is_primary: true
+      - network_name: dmz
+        ip_address: "172.16.1.47"
+        is_primary: false
+      - network_name: internal
+        ip_address: "172.16.2.43"
+        is_primary: false
+    cpu: 4
+    ram_mb: 4096
+    disk_gb: 60
+    position_x: 100
+    position_y: 200
+
+  - hostname: webserver
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-wordpress:latest"
+    network_interfaces:
+      - network_name: dmz
+        ip_address: "172.16.1.10"
+        is_primary: true
+      - network_name: internet
+        ip_address: "172.16.0.100"
+        is_primary: false
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 400
+    position_y: 200
+
+  - hostname: fileserver
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-fileserver:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.10"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 700
+    position_y: 100
+
+  - hostname: ws01
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-workstation:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.11"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 700
+    position_y: 200
+
+  - hostname: dc01
+    base_image_tag: "127.0.0.1:5000/cyroid/samba-dc:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.12"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 700
+    position_y: 300
