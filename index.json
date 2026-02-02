@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-01-30T00:22:36.673438+00:00"
+    "generated_at": "2026-02-02T20:10:51.711363+00:00"
   },
   "items": [
     {
@@ -18,16 +18,23 @@
       ],
       "version": "1.0",
       "path": "blueprints/red-team-training-lab",
-      "requires_images": [
-        "kali-attack",
-        "redteam-lab-wordpress",
-        "samba-dc",
-        "redteam-lab-fileserver",
-        "redteam-lab-workstation"
-      ],
+      "requires_images": [],
       "includes_msel": true,
       "includes_content": false,
-      "checksum": "sha256:62e54da9d09a2a2e"
+      "checksum": "sha256:6902c1f4b625a6b8"
+    },
+    {
+      "id": "red-team-training-lab-v2",
+      "type": "blueprint",
+      "name": "Red Team Training Lab v2",
+      "description": "Comprehensive red team training environment featuring:\n- Kali Attack Box with pre-installed tools (Metasploit, Impacket, CrackMapExec, etc.)\n- WordPress target with SQL injection vulnerabilities\n- Samba Domain Controller\n- Internal file server with sensitive data\n- Victim workstation for BeEF exploitation\n- C2 redirectors for infrastructure training\n\nAttack paths: SQLi -> Credential theft -> Lateral movement -> Domain compromise",
+      "tags": [],
+      "version": "1.0",
+      "path": "blueprints/red-team-training-lab-v2",
+      "requires_images": [],
+      "includes_msel": false,
+      "includes_content": false,
+      "checksum": "sha256:92834fda54c53698"
     },
     {
       "id": "apt-intrusion",
@@ -81,7 +88,7 @@
       "path": "images/kali-attack",
       "arch": "x86_64",
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:7fee85acdaaf4233"
+      "checksum": "sha256:348c227eb9d4802d"
     },
     {
       "id": "redteam-lab-fileserver",
@@ -109,7 +116,7 @@
       "path": "images/redteam-lab-wordpress",
       "arch": "x86_64",
       "docker_tag": "cyroid/redteam-lab-wordpress:latest",
-      "checksum": "sha256:b993b90073e0579f"
+      "checksum": "sha256:4ae5fea6f51767a9"
     },
     {
       "id": "redteam-lab-workstation",
@@ -137,7 +144,7 @@
       "path": "images/samba-dc",
       "arch": "both",
       "docker_tag": "cyroid/samba-dc:latest",
-      "checksum": "sha256:a674206cba30660a"
+      "checksum": "sha256:f8def8cd855783b0"
     },
     {
       "id": "windows-server-2019",
