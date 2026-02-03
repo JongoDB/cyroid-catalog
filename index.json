@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-02T20:10:51.711363+00:00"
+    "generated_at": "2026-02-03T18:16:14.134929+00:00"
   },
   "items": [
     {
@@ -18,7 +18,13 @@
       ],
       "version": "1.0",
       "path": "blueprints/red-team-training-lab",
-      "requires_images": [],
+      "requires_images": [
+        "kali-attack",
+        "redteam-lab-wordpress",
+        "redteam-lab-fileserver",
+        "redteam-lab-workstation",
+        "samba-dc"
+      ],
       "includes_msel": true,
       "includes_content": false,
       "checksum": "sha256:6902c1f4b625a6b8"
@@ -31,7 +37,13 @@
       "tags": [],
       "version": "1.0",
       "path": "blueprints/red-team-training-lab-v2",
-      "requires_images": [],
+      "requires_images": [
+        "kali-attack",
+        "redteam-lab-wordpress",
+        "redteam-lab-fileserver",
+        "redteam-lab-workstation",
+        "samba-dc"
+      ],
       "includes_msel": false,
       "includes_content": false,
       "checksum": "sha256:92834fda54c53698"
