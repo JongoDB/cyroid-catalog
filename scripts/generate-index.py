@@ -65,6 +65,12 @@ def scan_blueprints() -> list[dict]:
         requires_images = []
         for vm in bp.get("vms", []):
             tag = vm.get("base_image_tag", "")
+            # Strip registry prefix if present (e.g., 127.0.0.1:5000/cyroid/... -> cyroid/...)
+            if "/" in tag:
+                first_part = tag.split("/")[0]
+                if "." in first_part or ":" in first_part:
+                    # First part looks like a registry (has dots or port), strip it
+                    tag = "/".join(tag.split("/")[1:])
             if tag.startswith("cyroid/"):
                 project = tag.split("/")[1].split(":")[0]
                 if project not in requires_images:
