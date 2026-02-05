@@ -1,6 +1,6 @@
 name: Kali Attack Box
 tag: "cyroid/kali-attack:latest"
-description: Kali Linux attack platform with pre-installed penetration testing tools (Metasploit, Impacket, NetExec, etc.)
+description: Lightweight Kali Linux attack platform with pre-installed penetration testing tools (Impacket, NetExec, Hydra, etc.)
 arch:
   - x86_64
   - arm64

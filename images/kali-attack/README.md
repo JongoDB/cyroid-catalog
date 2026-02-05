@@ -4,7 +4,7 @@ Offensive security toolkit with KasmVNC desktop access.
 
 ## Overview
 
-This image provides a penetration testing environment based on Kali Linux with a VNC-accessible desktop. Built on `kasmweb/core-kali-rolling` (KasmVNC + Xfce desktop only) instead of the full `kali-rolling-desktop` image, it cherry-picks individual tools rather than pulling in the ~3.5GB `kali-tools-top10` metapackage. This brings the image size down to ~3-4GB from 8-10GB+.
+This image provides a penetration testing environment based on Kali Linux with a VNC-accessible desktop. Built on `kasmweb/core-kali-rolling` (KasmVNC + Xfce desktop only) instead of the full `kali-rolling-desktop` image, it cherry-picks individual tools rather than pulling in the ~3.5GB `kali-tools-top10` metapackage. This brings the image size down to ~1.5-2GB from 8-10GB+.
 
 ## Quick Start
 
@@ -30,9 +30,6 @@ docker run -d \
 - enum4linux, enum4linux-ng, ldap-utils
 - dnsrecon, dnsenum, fierce
 - tcpdump, netcat, socat
-
-### Exploitation Frameworks
-- Metasploit Framework
 
 ### Active Directory
 - Impacket suite (secretsdump, psexec, wmiexec, etc.)

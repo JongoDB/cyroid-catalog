@@ -6,7 +6,7 @@
 # pre-installs kali-tools-top10 (burpsuite, john, responder, etc.) that we
 # either don't need or install selectively ourselves.
 #
-# Estimated size: ~3-4GB (vs ~8-10GB+ with kali-rolling-desktop base)
+# Estimated size: ~1.5-2GB (vs ~8-10GB+ with kali-rolling-desktop base)
 #
 # Build: docker build -t cyroid/kali-attack:latest .
 # Run:   docker run -d -p 6901:6901 -e VNC_PW=password cyroid/kali-attack:latest
@@ -24,8 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # Network Reconnaissance & Scanning
     nmap masscan enum4linux enum4linux-ng ldap-utils dnsrecon dnsenum fierce \
     netcat-openbsd socat tcpdump \
-    # Exploitation Frameworks
-    metasploit-framework \
     # Active Directory Tools
     evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec \
     # Password Attacks (online brute-force only)
@@ -76,7 +74,6 @@ RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
 # === LAYER 3: Config + wordlist prep ===
 RUN if [ -f /usr/share/wordlists/rockyou.txt.gz ]; then gunzip -k /usr/share/wordlists/rockyou.txt.gz || true; fi && \
     echo 'alias ll="ls -la"' >> /etc/bash.bashrc && \
-    echo 'alias msfconsole="msfconsole -q"' >> /etc/bash.bashrc && \
     echo 'alias serve="python3 -m http.server 8080"' >> /etc/bash.bashrc && \
     echo 'alias linpeas="/opt/tools/peas/linpeas.sh"' >> /etc/bash.bashrc
 
