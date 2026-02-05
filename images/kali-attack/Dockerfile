@@ -19,6 +19,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     HOME=/home/kasm-default-profile \
     PATH="/opt/tools:/opt/tools/binaries:/usr/local/bin:${PATH}"
 
+# === LAYER 0: Refresh Kali repo signing key ===
+RUN wget -q -O /etc/apt/trusted.gpg.d/kali-archive-keyring.asc https://archive.kali.org/archive-key.asc
+
 # === LAYER 1: All apt packages in one RUN ===
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Network Reconnaissance & Scanning
