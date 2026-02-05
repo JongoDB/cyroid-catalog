@@ -34,7 +34,7 @@ docker run -d \
 ### Active Directory
 - Impacket suite (secretsdump, psexec, wmiexec, etc.)
 - NetExec (CrackMapExec successor)
-- Evil-WinRM
+- Evil-WinRM, samba-common-bin (net rpc)
 - Kerbrute (amd64)
 
 ### Password Attacks
@@ -45,11 +45,14 @@ docker run -d \
 
 ### Tunneling & Pivoting
 - Chisel
-- Ligolo-ng agent
-- Proxychains4, sshuttle, socat
+- Ligolo-ng (proxy + agent)
+- Proxychains4, sshuttle, socat, OpenVPN
 
 ### Post-Exploitation
 - LinPEAS, WinPEAS (32-bit + 64-bit)
+
+### Database & Service Clients
+- mysql client, ftp client
 
 ### Wireless
 - aircrack-ng

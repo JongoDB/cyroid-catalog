@@ -25,17 +25,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nmap masscan enum4linux enum4linux-ng ldap-utils dnsrecon dnsenum fierce \
     netcat-openbsd socat tcpdump \
     # Active Directory Tools
-    evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec \
+    evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec samba-common-bin \
     # Password Attacks (online brute-force only)
     hydra medusa \
     # Wordlists (base package: rockyou + dirb lists)
     wordlists \
     # Tunneling & Pivoting
-    proxychains4 sshuttle \
+    proxychains4 sshuttle openvpn \
     # Web Application Testing
     gobuster sqlmap \
     # Wireless
     aircrack-ng \
+    # Database & Service Clients
+    default-mysql-client ftp \
     # Utilities
     curl wget git vim tmux jq tree python3-pip python3-venv zsh fzf ripgrep \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -64,6 +66,13 @@ RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
         wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_agent_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo.tar.gz; \
     fi && \
     if [ -f /tmp/ligolo.tar.gz ]; then tar -xzf /tmp/ligolo.tar.gz -C /opt/tools/binaries/ && rm /tmp/ligolo.tar.gz && ln -sf /opt/tools/binaries/agent /usr/local/bin/ligolo-agent; fi && \
+    # Ligolo-ng proxy (server component, runs on Kali)
+    if [ "$ARCH" = "x86_64" ]; then \
+        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_amd64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
+    fi && \
+    if [ -f /tmp/ligolo-proxy.tar.gz ]; then tar -xzf /tmp/ligolo-proxy.tar.gz -C /opt/tools/binaries/ && rm /tmp/ligolo-proxy.tar.gz && ln -sf /opt/tools/binaries/proxy /usr/local/bin/ligolo-proxy; fi && \
     # PEAS
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh -O /opt/tools/peas/linpeas.sh && \
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe -O /opt/tools/peas/winpeas64.exe && \
