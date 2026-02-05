@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ACME CI/CD Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #333; }
+        h1 { color: #0f4c75; margin: 0; }
+        .user-info { color: #888; }
+        .user-info a { color: #0f4c75; }
+        nav { margin: 20px 0; }
+        nav a { color: #0f4c75; margin-right: 20px; text-decoration: none; padding: 10px 20px; background: #16213e; border-radius: 5px; }
+        nav a:hover { background: #1b262c; }
+        nav a.danger { background: #c0392b; }
+        .jobs { margin-top: 30px; }
+        .job { background: #16213e; padding: 20px; margin: 10px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .job-name { font-size: 18px; font-weight: bold; }
+        .job-info { color: #888; font-size: 14px; }
+        .status { padding: 5px 15px; border-radius: 15px; font-size: 12px; }
+        .status.success { background: #27ae60; }
+        .status.failed { background: #c0392b; }
+        .actions button { padding: 8px 16px; margin-left: 10px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-build { background: #0f4c75; color: white; }
+        .btn-config { background: #333; color: white; }
+        .flash { background: #27ae60; padding: 10px 20px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 ACME CI/CD Dashboard</h1>
+            <div class="user-info">
+                Logged in as: <strong>{{ user }}</strong> | <a href="/logout">Logout</a>
+            </div>
+        </header>
+
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/script-console" class="danger">Script Console</a>
+        </nav>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="jobs">
+            <h2>Build Jobs</h2>
+            {% for job in jobs %}
+            <div class="job">
+                <div>
+                    <div class="job-name">{{ job.name }}</div>
+                    <div class="job-info">Last run: {{ job.last_run }}</div>
+                </div>
+                <div class="actions">
+                    <span class="status {{ job.status }}">{{ job.status }}</span>
+                    <form method="POST" action="/build/{{ job.name }}" style="display: inline;">
+                        <button type="submit" class="btn-build">▶ Build</button>
+                    </form>
+                    <a href="/configure/{{ job.name }}"><button class="btn-config">⚙ Configure</button></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Documentation - ACME Wiki</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        a { color: #3498db; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #3498db; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        pre { background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 5px; overflow-x: auto; }
+        code { font-family: 'Courier New', monospace; }
+        nav { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav><a href="/">← Back to Home</a></nav>
+
+        <h1>Network Documentation</h1>
+
+        <h2>Network Segments</h2>
+        <table>
+            <tr>
+                <th>Segment</th>
+                <th>CIDR</th>
+                <th>Gateway</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>Internet</td>
+                <td>172.16.0.0/24</td>
+                <td>172.16.0.1</td>
+                <td>External connectivity</td>
+            </tr>
+            <tr>
+                <td>DMZ</td>
+                <td>172.16.1.0/24</td>
+                <td>172.16.1.1</td>
+                <td>Public-facing services</td>
+            </tr>
+            <tr>
+                <td>Internal</td>
+                <td>172.16.2.0/24</td>
+                <td>172.16.2.1</td>
+                <td>Corporate infrastructure</td>
+            </tr>
+        </table>
+
+        <h2>Network Diagram</h2>
+        <pre>
+INTERNET (172.16.0.0/24)
+├── firewall (.1)      ← Gateway/NAT
+├── kali (.10)         ← Security testing
+└── vpn (.50)          ← VPN endpoint
+
+DMZ (172.16.1.0/24)
+├── firewall (.1)      ← Gateway
+├── webserver (.10)    ← WordPress (public)
+├── jumpbox (.20)      ← SSH bastion
+├── ftp (.30)          ← FTP server
+└── jenkins (.40)      ← CI/CD
+
+INTERNAL (172.16.2.0/24)
+├── firewall (.1)      ← Gateway
+├── fileserver (.10)   ← SMB shares
+├── ws01 (.11)         ← Workstation
+├── dc01 (.12)         ← Domain Controller
+├── wiki (.20)         ← This wiki
+├── ticketing (.30)    ← IT helpdesk
+├── db01 (.40)         ← MySQL database
+└── vpn (.50)          ← VPN internal
+        </pre>
+
+        <h2>Key Systems - DMZ</h2>
+        <table>
+            <tr>
+                <th>Hostname</th>
+                <th>IP</th>
+                <th>Service</th>
+                <th>Port</th>
+            </tr>
+            <tr><td>webserver</td><td>172.16.1.10</td><td>WordPress</td><td>80, 443</td></tr>
+            <tr><td>jumpbox</td><td>172.16.1.20</td><td>SSH bastion</td><td>22</td></tr>
+            <tr><td>ftp</td><td>172.16.1.30</td><td>FTP server</td><td>21</td></tr>
+            <tr><td>jenkins</td><td>172.16.1.40</td><td>CI/CD</td><td>8080</td></tr>
+        </table>
+
+        <h2>Key Systems - Internal</h2>
+        <table>
+            <tr>
+                <th>Hostname</th>
+                <th>IP</th>
+                <th>Service</th>
+                <th>Port</th>
+            </tr>
+            <tr><td>fileserver</td><td>172.16.2.10</td><td>SMB shares</td><td>445</td></tr>
+            <tr><td>ws01</td><td>172.16.2.11</td><td>Workstation</td><td>-</td></tr>
+            <tr><td>dc01</td><td>172.16.2.12</td><td>Domain Controller</td><td>389, 636</td></tr>
+            <tr><td>wiki</td><td>172.16.2.20</td><td>This wiki</td><td>80</td></tr>
+            <tr><td>ticketing</td><td>172.16.2.30</td><td>IT Ticketing</td><td>80</td></tr>
+            <tr><td>db01</td><td>172.16.2.40</td><td>MySQL</td><td>3306</td></tr>
+            <tr><td>vpn</td><td>172.16.2.50</td><td>VPN endpoint</td><td>1194</td></tr>
+        </table>
+
+        <h2>VPN Access</h2>
+        <p>
+            <strong>VPN Server:</strong> 172.16.0.50<br>
+            <strong>Protocol:</strong> OpenVPN (UDP 1194)<br>
+            <strong>Config:</strong> Available from IT or jumpbox at <code>/etc/openvpn/client.ovpn</code>
+        </p>
+        <p>To connect, get credentials from IT (usually matches AD account) and use OpenVPN client.</p>
+
+        <p><em>Last updated: 2024-01-15</em></p>
+    </div>
+</body>
+</html>

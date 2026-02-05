@@ -1,0 +1,12 @@
+name: redteam-vpn
+tag: latest
+description: |
+  OpenVPN gateway for Red Team Training Lab v3.
+  Dual-homed, accepts credentials found via SQLi.
+container_config:
+  cap_add:
+    - NET_ADMIN
+  devices:
+    - /dev/net/tun
+  sysctls:
+    net.ipv4.ip_forward: "1"

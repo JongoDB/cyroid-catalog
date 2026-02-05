@@ -1,0 +1,5 @@
+name: redteam-jumpbox
+tag: latest
+description: |
+  Bastion/jump host for Red Team Training Lab v3.
+  SSH gateway to internal network with forwarding enabled.

@@ -1,0 +1,325 @@
+# CYROID Red Team Training Lab v3 Blueprint
+# Realistic network routing with pivoting requirements
+seed_id: red-team-training-lab-v3
+name: Red Team Training Lab v3
+description: |
+  Advanced red team training environment with realistic network segmentation.
+  Unlike v2, students must pivot through compromised hosts - no shortcuts!
+
+  Key Features:
+  - Realistic firewall/routing between network segments
+  - Multiple attack paths (SQLi, Jenkins RCE, VPN credential stuffing)
+  - SSH tunneling and proxychains required for lateral movement
+  - Enterprise services (wiki, ticketing, VPN) for added realism
+
+  Network Segments:
+  - Internet: Attacker position, sees only firewall NAT'd services
+  - DMZ: Web services, jump box, CI/CD
+  - Internal: Domain infrastructure, sensitive data
+
+  Primary Attack Path:
+  SQLi → SSH pivot → DMZ exploration → Internal access → Domain compromise
+
+version: "3.0"
+base_subnet_prefix: "172.16"
+
+networks:
+  - name: internet
+    subnet: "172.16.0.0/24"
+    gateway: "172.16.0.1"
+    is_isolated: false
+    internet_enabled: true
+
+  - name: dmz
+    subnet: "172.16.1.0/24"
+    gateway: "172.16.1.1"
+    is_isolated: true
+    internet_enabled: false
+
+  - name: internal
+    subnet: "172.16.2.0/24"
+    gateway: "172.16.2.1"
+    is_isolated: true
+    internet_enabled: false
+
+vms:
+  # ============================================================================
+  # INTERNET NETWORK (172.16.0.0/24) - Attacker's starting position
+  # ============================================================================
+
+  # Attacker workstation - ONLY on internet network (must pivot to reach others)
+  - hostname: kali
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: internet
+        ip_address: "172.16.0.10"
+        is_primary: true
+    cpu: 4
+    ram_mb: 4096
+    disk_gb: 60
+    position_x: 50
+    position_y: 200
+
+  # Firewall/Router - Controls all inter-segment traffic
+  # Multi-homed: internet (.1), dmz (.1), internal (.1)
+  - hostname: firewall
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-firewall:latest"
+    network_interfaces:
+      - network_name: internet
+        ip_address: "172.16.0.1"
+        is_primary: true
+      - network_name: dmz
+        ip_address: "172.16.1.1"
+        is_primary: false
+      - network_name: internal
+        ip_address: "172.16.2.1"
+        is_primary: false
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 250
+    position_y: 200
+
+  # VPN Gateway - Internet-facing entry point (alternative to web exploit)
+  # Multi-homed: internet (.50), internal (.50)
+  - hostname: vpn
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-vpn:latest"
+    network_interfaces:
+      - network_name: internet
+        ip_address: "172.16.0.50"
+        is_primary: true
+      - network_name: internal
+        ip_address: "172.16.2.50"
+        is_primary: false
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 50
+    position_y: 350
+
+  # ============================================================================
+  # DMZ NETWORK (172.16.1.0/24) - Externally accessible services
+  # ============================================================================
+
+  # WordPress with SQL injection - Primary initial access vector
+  # Exposed via firewall NAT on 172.16.0.100:80
+  - hostname: webserver
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-wordpress:latest"
+    network_interfaces:
+      - network_name: dmz
+        ip_address: "172.16.1.10"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 450
+    position_y: 100
+
+  # Jump box / Bastion host - "Legitimate" admin access to internal
+  - hostname: jumpbox
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-jumpbox:latest"
+    network_interfaces:
+      - network_name: dmz
+        ip_address: "172.16.1.20"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 450
+    position_y: 200
+
+  # FTP Server - Anonymous access with some sensitive files
+  - hostname: ftp
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-ftp:latest"
+    network_interfaces:
+      - network_name: dmz
+        ip_address: "172.16.1.30"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 450
+    position_y: 300
+
+  # Jenkins CI/CD - Groovy script console enabled (alternative RCE path)
+  # Exposed via firewall NAT on 172.16.0.100:8080
+  - hostname: jenkins
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-jenkins:latest"
+    network_interfaces:
+      - network_name: dmz
+        ip_address: "172.16.1.40"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 450
+    position_y: 400
+
+  # ============================================================================
+  # INTERNAL NETWORK (172.16.2.0/24) - Corporate infrastructure
+  # ============================================================================
+
+  # File server with sensitive documents including passwords.txt
+  - hostname: fileserver
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-fileserver:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.10"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 650
+    position_y: 50
+
+  # Employee workstation
+  - hostname: ws01
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-workstation:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.11"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 650
+    position_y: 150
+
+  # Samba Domain Controller
+  - hostname: dc01
+    base_image_tag: "127.0.0.1:5000/cyroid/samba-dc:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.12"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 650
+    position_y: 250
+
+  # Internal Wiki - Contains sensitive documentation
+  - hostname: wiki
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-wiki:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.20"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 650
+    position_y: 350
+
+  # Ticketing system - Exposes internal processes
+  - hostname: ticketing
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-ticketing:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.30"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 650
+    position_y: 450
+
+  # MySQL Database - Weak credentials
+  - hostname: db01
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-mysql:latest"
+    network_interfaces:
+      - network_name: internal
+        ip_address: "172.16.2.40"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 850
+    position_y: 200
+
+router:
+  enabled: false  # Using dedicated firewall VM instead
+
+# Firewall NAT rules (documented for reference, implemented in firewall container)
+# These rules are configured in the cyroid/redteam-firewall image
+firewall_rules:
+  nat:
+    # Internet-accessible services (via firewall's internet IP)
+    - description: "Web server HTTP"
+      external_ip: "172.16.0.100"
+      external_port: 80
+      internal_ip: "172.16.1.10"
+      internal_port: 80
+    - description: "Web server HTTPS"
+      external_ip: "172.16.0.100"
+      external_port: 443
+      internal_ip: "172.16.1.10"
+      internal_port: 443
+    - description: "Jenkins"
+      external_ip: "172.16.0.100"
+      external_port: 8080
+      internal_ip: "172.16.1.40"
+      internal_port: 8080
+
+  allowed_flows:
+    # DMZ to Internal (limited)
+    - src: "172.16.1.20"  # jumpbox
+      dst: "172.16.2.0/24"
+      ports: [22]
+      description: "Jumpbox SSH to internal"
+    - src: "172.16.1.10"  # webserver
+      dst: "172.16.2.40"
+      ports: [3306]
+      description: "Webserver to MySQL"
+    - src: "172.16.1.40"  # jenkins
+      dst: "172.16.2.10"
+      ports: [445]
+      description: "Jenkins to fileserver SMB"
+
+    # Internal to DMZ (admin access)
+    - src: "172.16.2.0/24"
+      dst: "172.16.1.20"
+      ports: [22]
+      description: "Internal to jumpbox SSH"
+
+# Training scenario events (MSEL)
+events:
+  - sequence: 1
+    delay_minutes: 0
+    title: "Phase 1: Reconnaissance"
+    description: "Scan the internet network, discover NAT'd services through firewall"
+
+  - sequence: 2
+    delay_minutes: 15
+    title: "Phase 2: Initial Access"
+    description: "Exploit SQL injection in WordPress to extract credentials"
+
+  - sequence: 3
+    delay_minutes: 30
+    title: "Phase 3: Pivot Setup"
+    description: "Establish SSH tunnel through webserver, configure proxychains"
+
+  - sequence: 4
+    delay_minutes: 45
+    title: "Phase 4: DMZ Exploration"
+    description: "Enumerate DMZ services through pivot - FTP, jumpbox, Jenkins"
+
+  - sequence: 5
+    delay_minutes: 60
+    title: "Phase 5: Internal Access"
+    description: "Reach internal network via jumpbox or extended tunnel"
+
+  - sequence: 6
+    delay_minutes: 75
+    title: "Phase 6: Lateral Movement"
+    description: "Access file server, discover domain admin credentials"
+
+  - sequence: 7
+    delay_minutes: 90
+    title: "Phase 7: Domain Compromise"
+    description: "Authenticate to DC, enumerate domain, establish persistence"
+
+  - sequence: 8
+    delay_minutes: 105
+    title: "Phase 8: Alternative Paths (Optional)"
+    description: "Explore Jenkins RCE or VPN credential stuffing attack vectors"

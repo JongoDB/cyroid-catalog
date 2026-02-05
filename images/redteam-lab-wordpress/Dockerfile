@@ -35,7 +35,10 @@ RUN mkdir /var/run/sshd && \
 # Create admin user (password reused from WordPress - vulnerability)
 RUN useradd -m -s /bin/bash admin && \
     echo "admin:Acme2024!" | chpasswd && \
-    usermod -aG sudo admin
+    usermod -aG sudo admin && \
+    # Service account - credentials extractable via SQLi (credential reuse vuln)
+    useradd -m -s /bin/bash svc_backup && \
+    echo "svc_backup:Backup2024" | chpasswd
 
 # Download WordPress
 RUN cd /tmp && \
