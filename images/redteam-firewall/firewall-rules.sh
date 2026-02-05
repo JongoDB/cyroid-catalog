@@ -65,6 +65,11 @@ iptables -t nat -A PREROUTING -d ${NAT_IP} -p tcp --dport 8080 \
 # SNAT: Masquerade return traffic from DMZ to internet
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
+# SNAT: Masquerade DNAT'd traffic entering DMZ so responses route back
+# through the firewall (without this, DMZ hosts send responses via Docker
+# bridge, bypassing the firewall's reverse-NAT)
+iptables -t nat -A POSTROUTING -o eth1 -s ${INTERNET_NET} -j MASQUERADE
+
 # ============================================================================
 # FORWARD RULES - Allow NAT'd traffic
 # ============================================================================
