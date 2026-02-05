@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-05T18:30:14.509325+00:00"
+    "generated_at": "2026-02-05T18:52:12.353302+00:00"
   },
   "items": [
     {
@@ -73,7 +73,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:544d0d0508ebfc15"
+      "checksum": "sha256:6fe94cc0e4689598"
     },
     {
       "id": "apt-intrusion",
