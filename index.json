@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-05T20:18:51.506263+00:00"
+    "generated_at": "2026-02-05T20:20:04.723799+00:00"
   },
   "items": [
     {
@@ -119,15 +119,18 @@
       "id": "kali-attack",
       "type": "image",
       "name": "Kali Attack Box",
-      "description": "Kali Linux attack platform with pre-installed penetration testing tools (Metasploit, Impacket, CrackMapExec, etc.)",
+      "description": "Lightweight Kali Linux attack platform with pre-installed penetration testing tools (Impacket, NetExec, Hydra, etc.)",
       "tags": [
         "offensive"
       ],
       "version": "1.0",
       "path": "images/kali-attack",
-      "arch": "x86_64",
+      "arch": [
+        "x86_64",
+        "arm64"
+      ],
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:ec10d1165cf3d9c9"
+      "checksum": "sha256:f206ce6568993ea2"
     },
     {
       "id": "redteam-firewall",
