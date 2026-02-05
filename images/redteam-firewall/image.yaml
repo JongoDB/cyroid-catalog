@@ -4,8 +4,7 @@ description: |
   Multi-homed firewall/router for Red Team Training Lab v3.
   Provides NAT and access control between network segments.
 container_config:
+  privileged: true
   cap_add:
     - NET_ADMIN
     - NET_RAW
-  sysctls:
-    net.ipv4.ip_forward: "1"
