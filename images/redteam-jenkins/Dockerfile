@@ -1,35 +1,27 @@
-# CYROID Red Team Lab - Vulnerable Jenkins
-# Jenkins with Script Console enabled and weak authentication
+# CYROID Red Team Lab - Vulnerable CI/CD Dashboard
+# Lightweight Python app with command injection (replaces heavy Jenkins)
 #
 # Credentials:
 # - admin:admin (full access)
 # - developer:Dev2024! (build access)
 #
 # Vulnerabilities:
-# - Script Console enabled (RCE via Groovy)
+# - Command injection in build script field
 # - Weak admin password
 # - No CSRF protection
 #
 # Build: docker build -t cyroid/redteam-jenkins:latest .
-# Size: ~470MB (Jenkins base is large but necessary)
+# Size: ~60MB (vs ~470MB for real Jenkins)
 
-FROM jenkins/jenkins:lts-jdk17
+FROM python:3.12-alpine
 
-USER root
+RUN apk add --no-cache bash curl netcat-openbsd \
+    && pip install --no-cache-dir flask
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY app.py /app/
+COPY templates/ /app/templates/
 
-USER jenkins
+EXPOSE 8080
 
-ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"
-
-COPY --chown=jenkins:jenkins jenkins-config/ /usr/share/jenkins/ref/
-
-RUN jenkins-plugin-cli --plugins \
-        git \
-        workflow-aggregator \
-        credentials \
-        script-security \
-        matrix-auth
+CMD ["python", "app.py"]

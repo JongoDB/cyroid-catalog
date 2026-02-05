@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Service Accounts - ACME Wiki</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        a { color: #3498db; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #3498db; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .confidential { background: #e74c3c; color: white; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-bottom: 20px; }
+        .note { background: #fffde7; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        nav { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav><a href="/">← Back to Home</a></nav>
+
+        <span class="confidential">CONFIDENTIAL - IT DEPARTMENT ONLY</span>
+
+        <h1>Service Accounts</h1>
+
+        <h2>Production Service Accounts</h2>
+        <table>
+            <tr>
+                <th>Account</th>
+                <th>Purpose</th>
+                <th>Server</th>
+                <th>Notes</th>
+            </tr>
+            <tr>
+                <td><code>svc_backup</code></td>
+                <td>Backup operations</td>
+                <td>fileserver</td>
+                <td>Has access to all shares</td>
+            </tr>
+            <tr>
+                <td><code>svc_deploy</code></td>
+                <td>CI/CD deployments</td>
+                <td>jenkins</td>
+                <td>Can push to production</td>
+            </tr>
+            <tr>
+                <td><code>svc_monitor</code></td>
+                <td>Monitoring</td>
+                <td>all</td>
+                <td>Read-only</td>
+            </tr>
+            <tr>
+                <td><code>svc_db</code></td>
+                <td>Database access</td>
+                <td>db01</td>
+                <td>MySQL admin</td>
+            </tr>
+        </table>
+
+        <h2>Emergency Access</h2>
+        <div class="note">
+            <strong>BREAK GLASS ONLY</strong> - Use only in emergencies. All usage is logged and audited.
+        </div>
+
+        <h3>Domain Admin (Break Glass)</h3>
+        <table>
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Username</td><td><code>Administrator</code></td></tr>
+            <tr><td>Password</td><td><code>Adm1n2024</code></td></tr>
+            <tr><td>Last Changed</td><td>2024-01-01</td></tr>
+        </table>
+
+        <h3>Database Root</h3>
+        <table>
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Server</td><td>db01 (172.16.2.40)</td></tr>
+            <tr><td>Username</td><td><code>root</code></td></tr>
+            <tr><td>Password</td><td><code>DBr00t2024!</code></td></tr>
+        </table>
+
+        <h3>Jenkins Admin</h3>
+        <table>
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>URL</td><td>http://jenkins.dmz.acmewidgets.local:8080</td></tr>
+            <tr><td>Username</td><td><code>admin</code></td></tr>
+            <tr><td>Password</td><td><code>admin</code></td></tr>
+            <tr><td>Note</td><td style="color: #e74c3c;"><strong>CHANGE THIS!</strong></td></tr>
+        </table>
+
+        <h2>Password Rotation Schedule</h2>
+        <ul>
+            <li>Service accounts: Quarterly</li>
+            <li>Admin accounts: Monthly</li>
+            <li>Emergency accounts: After each use</li>
+        </ul>
+
+        <p><em>Last updated: 2024-01-10 by IT Admin</em></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configure Job - ACME CI/CD</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #333; }
+        h1 { color: #0f4c75; margin: 0; }
+        .user-info { color: #888; }
+        .user-info a { color: #0f4c75; }
+        nav { margin: 20px 0; }
+        nav a { color: #0f4c75; margin-right: 20px; text-decoration: none; padding: 10px 20px; background: #16213e; border-radius: 5px; }
+        label { display: block; margin-top: 20px; color: #888; }
+        input, textarea { width: 100%; background: #0d0d0d; color: #eee; border: 1px solid #333; padding: 12px; font-family: monospace; border-radius: 5px; box-sizing: border-box; margin-top: 5px; }
+        textarea { height: 150px; }
+        button { padding: 12px 30px; background: #0f4c75; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        .output { background: #0d0d0d; padding: 20px; border-radius: 5px; margin-top: 20px; }
+        .output pre { color: #0f0; margin: 0; white-space: pre-wrap; }
+        h2 { color: #0f4c75; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 ACME CI/CD Dashboard</h1>
+            <div class="user-info">
+                Logged in as: <strong>{{ user }}</strong> | <a href="/logout">Logout</a>
+            </div>
+        </header>
+
+        <nav>
+            <a href="/">← Back to Dashboard</a>
+        </nav>
+
+        <h2>Configure: {{ job_name }}</h2>
+
+        <form method="POST">
+            <label>Job Name</label>
+            <input type="text" value="{{ job_name }}" disabled>
+
+            <label>Repository URL</label>
+            <input type="text" value="git@github.com:acme/{{ job_name }}.git">
+
+            <label>Branch</label>
+            <input type="text" value="main">
+
+            <label>Build Commands</label>
+            <textarea name="build_command" placeholder="Enter build commands...">#!/bin/bash
+echo "Building {{ job_name }}..."
+# Add your build commands here</textarea>
+
+            <button type="submit">💾 Save & Test Build</button>
+        </form>
+
+        {% if output %}
+        <div class="output">
+            <h3>Build Output:</h3>
+            <pre>{{ output }}</pre>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

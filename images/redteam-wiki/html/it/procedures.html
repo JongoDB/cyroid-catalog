@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IT Procedures - ACME Wiki</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        a { color: #3498db; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        pre { background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 5px; overflow-x: auto; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0; }
+        nav { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav><a href="/">← Back to Home</a></nav>
+
+        <h1>IT Procedures</h1>
+
+        <h2>Password Reset Procedure</h2>
+        <ol>
+            <li>Verify user identity via phone callback</li>
+            <li>Reset password in AD to temporary value</li>
+            <li>Set "must change password at next logon"</li>
+            <li>Communicate new password via secure channel</li>
+        </ol>
+
+        <h2>New Employee Onboarding</h2>
+        <ol>
+            <li>Create AD account with standard naming: <code>first initial + last name</code></li>
+            <li>Set initial password to <code>Welcome123</code></li>
+            <li>Add to appropriate security groups</li>
+            <li>Create email account</li>
+            <li>Request VPN access if needed</li>
+        </ol>
+
+        <div class="warning">
+            <strong>Note:</strong> All new employees should change their password immediately upon first login.
+        </div>
+
+        <h2>Backup Procedures</h2>
+        <p>Backups are handled by the <code>svc_backup</code> service account.</p>
+        <pre>
+# Daily backup script location
+/opt/scripts/daily-backup.sh
+
+# Backup destination
+\\fileserver\backups\
+
+# Credentials (stored in script)
+Username: svc_backup
+Password: Backup2024
+        </pre>
+
+        <h2>Emergency Contacts</h2>
+        <ul>
+            <li>IT Manager: ext. 5001</li>
+            <li>Security Team: ext. 5002</li>
+            <li>After hours: See emergency binder in server room</li>
+        </ul>
+
+        <p><em>Last updated: 2024-01-05</em></p>
+    </div>
+</body>
+</html>

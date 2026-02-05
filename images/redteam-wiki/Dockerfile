@@ -1,26 +1,11 @@
-# CYROID Red Team Lab - Internal Wiki (DokuWiki)
-# Contains sensitive internal documentation
-#
-# Credentials:
-# - admin:Admin2024! (full access)
-# - employee:Welcome123 (read access)
+# CYROID Red Team Lab - Internal Wiki (Static)
+# Contains sensitive internal documentation as static HTML
 #
 # Build: docker build -t cyroid/redteam-wiki:latest .
-# Size: ~200MB (PHP/Apache base)
+# Size: ~25MB (nginx:alpine vs ~200MB for php:apache)
 
-FROM php:8.2-apache
+FROM nginx:alpine
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        libpng-dev \
-        libjpeg-dev \
-    && docker-php-ext-configure gd --with-jpeg \
-    && docker-php-ext-install gd \
-    && rm -rf /var/lib/apt/lists/* \
-    && curl -sL https://download.dokuwiki.org/src/dokuwiki/dokuwiki-stable.tgz | tar -xz -C /var/www/html --strip-components=1 \
-    && chown -R www-data:www-data /var/www/html
-
-COPY wiki-data/ /var/www/html/data/
-
-RUN chown -R www-data:www-data /var/www/html/data
+COPY html/ /usr/share/nginx/html/
 
 EXPOSE 80

@@ -1,5 +1,5 @@
-# CYROID Red Team Lab - MySQL Database
-# Database server with weak credentials and sensitive data
+# CYROID Red Team Lab - Database Server (MariaDB)
+# Lightweight database with weak credentials and sensitive data
 #
 # Credentials:
 # - root:DBr00t2024! (full access)
@@ -7,13 +7,12 @@
 # - backup:Backup2024 (read-only)
 #
 # Build: docker build -t cyroid/redteam-mysql:latest .
+# Size: ~150MB (vs ~550MB for mysql:8.0)
 
-FROM mysql:8.0
+FROM mariadb:10-alpine
 
-# Environment for initial setup
-ENV MYSQL_ROOT_PASSWORD=DBr00t2024!
+ENV MARIADB_ROOT_PASSWORD=DBr00t2024!
 
-# Copy initialization scripts
 COPY init/ /docker-entrypoint-initdb.d/
 
 EXPOSE 3306
