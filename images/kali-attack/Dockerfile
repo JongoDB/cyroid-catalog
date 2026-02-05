@@ -23,9 +23,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Network Reconnaissance & Scanning
     nmap masscan enum4linux enum4linux-ng ldap-utils dnsrecon dnsenum fierce \
-    netcat-openbsd socat tcpdump wireshark-common tshark \
+    netcat-openbsd socat tcpdump \
     # Exploitation Frameworks
-    metasploit-framework exploitdb \
+    metasploit-framework \
     # Active Directory Tools
     evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec \
     # Password Attacks (online brute-force only)

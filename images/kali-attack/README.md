@@ -29,11 +29,10 @@ docker run -d \
 - nmap, masscan
 - enum4linux, enum4linux-ng, ldap-utils
 - dnsrecon, dnsenum, fierce
-- tshark, tcpdump, netcat, socat
+- tcpdump, netcat, socat
 
 ### Exploitation Frameworks
 - Metasploit Framework
-- SearchSploit (ExploitDB)
 
 ### Active Directory
 - Impacket suite (secretsdump, psexec, wmiexec, etc.)
