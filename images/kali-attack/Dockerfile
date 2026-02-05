@@ -1,19 +1,18 @@
-# CYROID Kali Attack Box (Optimized)
-# Full offensive security toolkit with KasmVNC desktop access
+# CYROID Kali Attack Box
+# Offensive security toolkit with KasmVNC desktop access
 #
-# OPTIMIZED:
-# - Reduced from 14 RUN commands to 4 for faster builds
-# - Removed ghidra (~400MB), bloodhound/neo4j (~300MB), golang-go (~200MB)
-# - Removed seclists (~700MB) - using dirb wordlists for gobuster instead
-# - Removed radare2, feroxbuster, ffuf, wfuzz, nikto, whatweb (~100MB)
-# - Removed responder, hashcat, john (~150MB)
-# - Total savings: ~2GB+
+# Base: kasmweb/core-kali-rolling (KasmVNC + Xfce only, NO kali-tools-top10)
+# This avoids ~3.5GB of bloat from the kali-rolling-desktop image which
+# pre-installs kali-tools-top10 (burpsuite, john, responder, etc.) that we
+# either don't need or install selectively ourselves.
+#
+# Estimated size: ~1.5-2GB (vs ~8-10GB+ with kali-rolling-desktop base)
 #
 # Build: docker build -t cyroid/kali-attack:latest .
-# Run: docker run -d -p 6901:6901 -e VNC_PW=password cyroid/kali-attack:latest
+# Run:   docker run -d -p 6901:6901 -e VNC_PW=password cyroid/kali-attack:latest
 
-ARG BASE_TAG="1.15.0"
-FROM kasmweb/kali-rolling-desktop:${BASE_TAG}
+ARG BASE_TAG="1.17.0"
+FROM kasmweb/core-kali-rolling:${BASE_TAG}
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -21,37 +20,32 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/tools:/opt/tools/binaries:/usr/local/bin:${PATH}"
 
 # === LAYER 1: All apt packages in one RUN ===
-# Removed: ghidra, golang-go, seclists
-# Removed: bloodhound (installed via apt) - will skip pip bloodhound too
-RUN apt-get update --allow-insecure-repositories && \
-    apt-get install -y --allow-unauthenticated kali-archive-keyring && \
-    apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     # Network Reconnaissance & Scanning
     nmap masscan enum4linux enum4linux-ng ldap-utils dnsrecon dnsenum fierce \
-    netcat-openbsd socat tcpdump wireshark \
-    # Exploitation Frameworks
-    metasploit-framework exploitdb \
+    netcat-openbsd socat tcpdump \
     # Active Directory Tools
-    evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec \
-    # Password Attacks (hydra/medusa for online attacks only)
+    evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec samba-common-bin \
+    # Password Attacks (online brute-force only)
     hydra medusa \
-    # Wordlists - just the base package with dirb lists for gobuster
+    # Wordlists (base package: rockyou + dirb lists)
     wordlists \
     # Tunneling & Pivoting
-    proxychains4 sshuttle \
-    # Web Application Testing (gobuster + sqlmap only)
+    proxychains4 sshuttle openvpn \
+    # Web Application Testing
     gobuster sqlmap \
     # Wireless
     aircrack-ng \
+    # Database & Service Clients
+    default-mysql-client ftp \
     # Utilities
     curl wget git vim tmux jq tree python3-pip python3-venv zsh fzf ripgrep \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# === LAYER 2: All tool downloads + pip installs in one RUN ===
-# Removed: bloodhound.py (no longer needed without bloodhound)
+# === LAYER 2: Tool downloads (not in Kali repos) ===
 RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
-    # Kerbrute (x86_64 only)
     ARCH=$(uname -m) && \
+    # Kerbrute
     if [ "$ARCH" = "x86_64" ]; then \
         wget -q https://github.com/ropnop/kerbrute/releases/latest/download/kerbrute_linux_amd64 -O /usr/local/bin/kerbrute && \
         chmod +x /usr/local/bin/kerbrute; \
@@ -72,6 +66,13 @@ RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
         wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_agent_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo.tar.gz; \
     fi && \
     if [ -f /tmp/ligolo.tar.gz ]; then tar -xzf /tmp/ligolo.tar.gz -C /opt/tools/binaries/ && rm /tmp/ligolo.tar.gz && ln -sf /opt/tools/binaries/agent /usr/local/bin/ligolo-agent; fi && \
+    # Ligolo-ng proxy (server component, runs on Kali)
+    if [ "$ARCH" = "x86_64" ]; then \
+        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_amd64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
+    fi && \
+    if [ -f /tmp/ligolo-proxy.tar.gz ]; then tar -xzf /tmp/ligolo-proxy.tar.gz -C /opt/tools/binaries/ && rm /tmp/ligolo-proxy.tar.gz && ln -sf /opt/tools/binaries/proxy /usr/local/bin/ligolo-proxy; fi && \
     # PEAS
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh -O /opt/tools/peas/linpeas.sh && \
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe -O /opt/tools/peas/winpeas64.exe && \
@@ -79,18 +80,15 @@ RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
     wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64 -O /opt/tools/peas/linpeas_amd64 && \
     chmod +x /opt/tools/peas/linpeas.sh /opt/tools/peas/linpeas_amd64
 
-# === LAYER 3: Config files + wordlist prep in one RUN ===
+# === LAYER 3: Config + wordlist prep ===
 RUN if [ -f /usr/share/wordlists/rockyou.txt.gz ]; then gunzip -k /usr/share/wordlists/rockyou.txt.gz || true; fi && \
-    # Aliases
     echo 'alias ll="ls -la"' >> /etc/bash.bashrc && \
-    echo 'alias msfconsole="msfconsole -q"' >> /etc/bash.bashrc && \
     echo 'alias serve="python3 -m http.server 8080"' >> /etc/bash.bashrc && \
-    echo 'alias linpeas="/opt/tools/peas/linpeas.sh"' >> /etc/bash.bashrc && \
-    echo 'Cheatsheet installed at ~/TOOLS_CHEATSHEET.md'
+    echo 'alias linpeas="/opt/tools/peas/linpeas.sh"' >> /etc/bash.bashrc
 
 COPY TOOLS_CHEATSHEET.md /home/kasm-default-profile/TOOLS_CHEATSHEET.md
 
-# === LAYER 4: Fix permissions (must be separate, touches many files) ===
+# === LAYER 4: Fix permissions ===
 RUN chown -R 1000:1000 /home/kasm-default-profile /opt/tools
 
 WORKDIR /home/kasm-user
