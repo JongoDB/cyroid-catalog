@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-05T18:18:47.574078+00:00"
+    "generated_at": "2026-02-05T18:24:59.933753+00:00"
   },
   "items": [
     {
@@ -54,7 +54,7 @@
       "name": "Red Team Training Lab v3",
       "description": "Advanced red team training environment with realistic network segmentation.\nUnlike v2, students must pivot through compromised hosts - no shortcuts!\n\nKey Features:\n- Realistic firewall/routing between network segments\n- Multiple attack paths (SQLi, Jenkins RCE, VPN credential stuffing)\n- SSH tunneling and proxychains required for lateral movement\n- Enterprise services (wiki, ticketing, VPN) for added realism\n\nNetwork Segments:\n- Internet: Attacker position, sees only firewall NAT'd services\n- DMZ: Web services, jump box, CI/CD\n- Internal: Domain infrastructure, sensitive data\n\nPrimary Attack Path:\nSQLi \u2192 SSH pivot \u2192 DMZ exploration \u2192 Internal access \u2192 Domain compromise",
       "tags": [],
-      "version": "1.0",
+      "version": "3.0",
       "path": "blueprints/red-team-training-lab-v3",
       "requires_images": [
         "kali-attack",

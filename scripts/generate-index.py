@@ -94,7 +94,7 @@ def scan_blueprints() -> list[dict]:
             "name": bp.get("name", bp_dir.name),
             "description": bp.get("description", "").strip(),
             "tags": tags,
-            "version": walkthrough.get("version", "1.0"),
+            "version": bp.get("version") or walkthrough.get("version", "1.0"),
             "path": f"blueprints/{bp_dir.name}",
             "requires_images": requires_images,
             "includes_msel": has_msel,
