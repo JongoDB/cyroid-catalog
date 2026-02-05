@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-05T18:52:12.353302+00:00"
+    "generated_at": "2026-02-05T20:18:51.506263+00:00"
   },
   "items": [
     {
@@ -141,7 +141,7 @@
       "path": "images/redteam-firewall",
       "arch": "x86_64",
       "docker_tag": "latest",
-      "checksum": "sha256:bc2410939e40e02f"
+      "checksum": "sha256:b1f024becce82b5b"
     },
     {
       "id": "redteam-ftp",
@@ -267,7 +267,7 @@
       "path": "images/redteam-vpn",
       "arch": "x86_64",
       "docker_tag": "latest",
-      "checksum": "sha256:f487c0e06b1e3be7"
+      "checksum": "sha256:bc117ea49b35fe93"
     },
     {
       "id": "redteam-wiki",
@@ -295,7 +295,7 @@
       "path": "images/samba-dc",
       "arch": "both",
       "docker_tag": "cyroid/samba-dc:latest",
-      "checksum": "sha256:f8def8cd855783b0"
+      "checksum": "sha256:f202cd72c85b626a"
     },
     {
       "id": "windows-server-2019",
