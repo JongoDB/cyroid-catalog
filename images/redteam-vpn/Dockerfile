@@ -27,23 +27,23 @@ RUN apk add --no-cache \
         linux-pam \
         openvpn-auth-pam \
         shadow \
-    # Set up Easy-RSA PKI
+    # Set up Easy-RSA PKI - use full paths
     && mkdir -p /etc/openvpn/easy-rsa \
-    && ln -s /usr/share/easy-rsa/* /etc/openvpn/easy-rsa/ \
+    && cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa/ \
     && cd /etc/openvpn/easy-rsa \
-    && ./easyrsa init-pki \
-    && echo "ACME Widgets VPN CA" | ./easyrsa build-ca nopass \
-    && ./easyrsa gen-dh \
-    && ./easyrsa build-server-full server nopass \
-    && ./easyrsa build-client-full client nopass \
+    && ./easyrsa --batch init-pki \
+    && echo "ACME Widgets VPN CA" | ./easyrsa --batch build-ca nopass \
+    && ./easyrsa --batch gen-dh \
+    && ./easyrsa --batch build-server-full server nopass \
+    && ./easyrsa --batch build-client-full client nopass \
     && openvpn --genkey secret /etc/openvpn/ta.key \
     && cp pki/ca.crt pki/private/server.key pki/issued/server.crt pki/dh.pem /etc/openvpn/ \
     # Create VPN users
     && adduser -D -s /bin/false vpnuser && echo "vpnuser:VPN2024!" | chpasswd \
     && adduser -D -s /bin/false jsmith && echo "jsmith:Summer2024" | chpasswd \
     && adduser -D -s /bin/false mwilliams && echo "mwilliams:Welcome123" | chpasswd \
-    # Cleanup PKI build files to reduce size
-    && rm -rf /etc/openvpn/easy-rsa/pki/reqs /etc/openvpn/easy-rsa/pki/private \
+    # Cleanup to reduce size
+    && rm -rf /etc/openvpn/easy-rsa/pki/reqs /etc/openvpn/easy-rsa/pki/certs_by_serial \
     && chmod +x /entrypoint.sh
 
 EXPOSE 1194/udp
