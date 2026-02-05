@@ -1,0 +1,5 @@
+name: redteam-jenkins
+tag: latest
+description: |
+  Vulnerable Jenkins for Red Team Training Lab v3.
+  Script Console enabled with weak admin credentials.

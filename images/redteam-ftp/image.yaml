@@ -1,0 +1,5 @@
+name: redteam-ftp
+tag: latest
+description: |
+  FTP server for Red Team Training Lab v3.
+  Anonymous access with sensitive files and weak credentials.

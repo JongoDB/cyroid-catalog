@@ -1,0 +1,21 @@
+====== ACME Widgets Internal Wiki ======
+
+Welcome to the ACME Widgets internal documentation portal.
+
+===== Quick Links =====
+
+  * [[it:network|Network Documentation]]
+  * [[it:services|Service Accounts]]
+  * [[it:procedures|IT Procedures]]
+  * [[hr:onboarding|New Employee Onboarding]]
+
+===== Recent Updates =====
+
+  * 2024-01-15 - Updated VPN configuration
+  * 2024-01-10 - New backup procedures
+  * 2024-01-05 - Password policy reminder
+
+===== Contact =====
+
+IT Support: it-support@acmewidgets.local
+Security Team: security@acmewidgets.local

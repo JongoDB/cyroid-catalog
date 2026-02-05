@@ -1,0 +1,5 @@
+name: redteam-ticketing
+tag: latest
+description: |
+  IT Ticketing system for Red Team Training Lab v3.
+  Tickets expose internal processes and credentials.

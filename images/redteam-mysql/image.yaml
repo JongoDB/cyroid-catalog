@@ -1,0 +1,5 @@
+name: redteam-mysql
+tag: latest
+description: |
+  MySQL database for Red Team Training Lab v3.
+  Contains sensitive data with weak root credentials.

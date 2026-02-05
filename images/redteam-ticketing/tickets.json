@@ -1,0 +1,56 @@
+[
+  {
+    "id": "TKT-001",
+    "subject": "VPN Access Request",
+    "description": "Need VPN access for remote work. Manager approved.\n\nNote from IT: Credentials set to jsmith / VPN2024! - please change on first login.",
+    "user": "John Smith",
+    "date": "2024-01-14",
+    "status": "closed",
+    "assigned": "IT Admin"
+  },
+  {
+    "id": "TKT-002",
+    "subject": "Password Reset - svc_backup",
+    "description": "The svc_backup service account password needs to be reset.\n\nResolution: Password reset to Backup2024 - updated in password manager and wiki.",
+    "user": "System Admin",
+    "date": "2024-01-10",
+    "status": "closed",
+    "assigned": "IT Admin"
+  },
+  {
+    "id": "TKT-003",
+    "subject": "Jenkins Deployment Failing",
+    "description": "Jenkins can't deploy to fileserver. Getting SMB authentication errors.\n\nNote: Temporarily using svc_backup credentials until svc_deploy account is fixed.",
+    "user": "Developer Team",
+    "date": "2024-01-12",
+    "status": "open",
+    "assigned": "IT Admin"
+  },
+  {
+    "id": "TKT-004",
+    "subject": "New Employee Setup - Mary Williams",
+    "description": "Please set up accounts for new employee Mary Williams starting Monday.\n\nCompleted:\n- AD account: mwilliams\n- Initial password: Welcome123\n- Email configured\n- VPN access granted",
+    "user": "HR Department",
+    "date": "2024-01-08",
+    "status": "closed",
+    "assigned": "IT Admin"
+  },
+  {
+    "id": "TKT-005",
+    "subject": "Database Backup Failed",
+    "description": "Nightly backup of db01 failed with authentication error.\n\nRoot cause: MySQL root password was changed but backup script not updated.\nFix: Updated script with new password DBr00t2024!",
+    "user": "Monitoring System",
+    "date": "2024-01-09",
+    "status": "closed",
+    "assigned": "DBA Team"
+  },
+  {
+    "id": "TKT-006",
+    "subject": "Security Audit Findings",
+    "description": "Findings from Q4 security audit:\n1. Jenkins admin password is still default\n2. FTP allows anonymous access\n3. Wiki has sensitive passwords in plain text\n\nStatus: Remediation planned for Q2",
+    "user": "Security Team",
+    "date": "2024-01-05",
+    "status": "open",
+    "assigned": "IT Manager"
+  }
+]

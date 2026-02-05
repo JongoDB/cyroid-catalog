@@ -1,0 +1,38 @@
+====== Service Accounts ======
+
+**CONFIDENTIAL - IT DEPARTMENT ONLY**
+
+===== Production Service Accounts =====
+
+| Account | Purpose | Server | Notes |
+| svc_backup | Backup operations | fileserver | Has access to all shares |
+| svc_deploy | CI/CD deployments | jenkins | Can push to production |
+| svc_monitor | Monitoring | all | Read-only |
+| svc_db | Database access | db01 | MySQL admin |
+
+===== Emergency Access =====
+
+In case of emergency, the following accounts can be used:
+
+**Domain Admin (Break Glass)**
+  * Username: Administrator
+  * Password: See IT Manager or check emergency binder in server room
+  * Note: Password was last changed to Adm1n2024 on 2024-01-01
+
+**Database Root**
+  * Server: db01 (172.16.2.40)
+  * Username: root
+  * Password: DBr00t2024!
+
+**Jenkins Admin**
+  * URL: http://jenkins.dmz.acmewidgets.local:8080
+  * Username: admin
+  * Password: admin (CHANGE THIS!)
+
+===== Password Rotation Schedule =====
+
+  * Service accounts: Quarterly
+  * Admin accounts: Monthly
+  * Emergency accounts: After each use
+
+//Last updated: 2024-01-10 by IT Admin//

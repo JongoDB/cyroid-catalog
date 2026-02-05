@@ -1,0 +1,5 @@
+name: redteam-wiki
+tag: latest
+description: |
+  Internal DokuWiki for Red Team Training Lab v3.
+  Contains sensitive documentation including credentials.
