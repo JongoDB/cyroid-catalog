@@ -3,3 +3,5 @@ tag: "cyroid/samba-dc:latest"
 description: Ubuntu-based Samba AD DC with DNS, LDAP, and user provisioning. ARM-compatible alternative to Windows AD.
 arch: both
 category: infrastructure
+container_config:
+  privileged: true
