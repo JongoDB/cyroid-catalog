@@ -1,10 +1,10 @@
 # CYROID Kali Attack Box
 
-Full offensive security toolkit with KasmVNC desktop access.
+Offensive security toolkit with KasmVNC desktop access.
 
 ## Overview
 
-This image provides a complete penetration testing environment based on Kali Linux with a VNC-accessible desktop. It includes all major tools for network reconnaissance, Active Directory attacks, password cracking, web application testing, and post-exploitation.
+This image provides a penetration testing environment based on Kali Linux with a VNC-accessible desktop. Built on `kasmweb/core-kali-rolling` (KasmVNC + Xfce desktop only) instead of the full `kali-rolling-desktop` image, it cherry-picks individual tools rather than pulling in the ~3.5GB `kali-tools-top10` metapackage. This brings the image size down to ~3-4GB from 8-10GB+.
 
 ## Quick Start
 
@@ -26,10 +26,10 @@ docker run -d \
 ## Included Tools
 
 ### Network Reconnaissance
-- nmap, masscan, rustscan
-- enum4linux, enum4linux-ng
+- nmap, masscan
+- enum4linux, enum4linux-ng, ldap-utils
 - dnsrecon, dnsenum, fierce
-- wireshark, tcpdump
+- tshark, tcpdump, netcat, socat
 
 ### Exploitation Frameworks
 - Metasploit Framework
@@ -37,50 +37,48 @@ docker run -d \
 
 ### Active Directory
 - Impacket suite (secretsdump, psexec, wmiexec, etc.)
-- CrackMapExec / NetExec
+- NetExec (CrackMapExec successor)
 - Evil-WinRM
-- BloodHound + bloodhound.py
-- Kerbrute
+- Kerbrute (amd64)
 
 ### Password Attacks
-- Hashcat, John the Ripper
-- Hydra, Medusa
-- Responder
+- Hydra, Medusa (online brute-force)
 
 ### Web Testing
-- nikto, gobuster, feroxbuster, ffuf
-- sqlmap, wfuzz, whatweb
+- gobuster, sqlmap
 
 ### Tunneling & Pivoting
 - Chisel
 - Ligolo-ng agent
-- Proxychains4, socat, sshuttle
+- Proxychains4, sshuttle, socat
 
 ### Post-Exploitation
-- LinPEAS, WinPEAS
-- Various scripts in /opt/tools/
+- LinPEAS, WinPEAS (32-bit + 64-bit)
+
+### Wireless
+- aircrack-ng
 
 ### Wordlists
 - rockyou.txt
-- SecLists (full collection)
+- dirb wordlists (common.txt, big.txt)
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | VNC_PW | (required) | VNC access password |
-| VNC_RESOLUTION | 1920x1080 | Desktop resolution |
+| VNC_RESOLUTION | 1280x720 | Desktop resolution |
 
 ## File Locations
 
 - **Tools**: `/opt/tools/`
 - **PEAS scripts**: `/opt/tools/peas/`
-- **Wordlists**: `/usr/share/wordlists/`, `/usr/share/seclists/`
+- **Wordlists**: `/usr/share/wordlists/`
 - **Cheatsheet**: `/home/kasm-user/TOOLS_CHEATSHEET.md`
 
 ## Architecture Support
 
-This image supports both `linux/amd64` and `linux/arm64` architectures.
+This image supports both `linux/amd64` and `linux/arm64`. Some downloaded tools (Kerbrute) are amd64-only; the rest work on both architectures.
 
 ## In CYROID
 
@@ -109,4 +107,4 @@ RUN apt-get update && apt-get install -y <your-tool>
 USER 1000
 ```
 
-Then save as a snapshot in CYROID for reuse.
+Then save as a snapshot in CYROID for reuse. Since the base is Kali Rolling, the full Kali tool repository is available via `apt install`.
