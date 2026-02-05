@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-05T18:24:59.933753+00:00"
+    "generated_at": "2026-02-05T18:30:14.509325+00:00"
   },
   "items": [
     {
@@ -169,7 +169,7 @@
       "path": "images/redteam-jenkins",
       "arch": "x86_64",
       "docker_tag": "latest",
-      "checksum": "sha256:23d7dd9708ee270a"
+      "checksum": "sha256:f87972280c12ef96"
     },
     {
       "id": "redteam-jumpbox",
