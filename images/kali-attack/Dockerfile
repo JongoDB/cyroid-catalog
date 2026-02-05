@@ -20,7 +20,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/tools:/opt/tools/binaries:/usr/local/bin:${PATH}"
 
 # === LAYER 1: All apt packages in one RUN ===
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# The core image's kali-archive-keyring can go stale; refresh it first
+RUN apt-get update --allow-insecure-repositories && \
+    apt-get install -y --allow-unauthenticated kali-archive-keyring && \
+    apt-get update && apt-get install -y --no-install-recommends \
     # Network Reconnaissance & Scanning
     nmap masscan enum4linux enum4linux-ng ldap-utils dnsrecon dnsenum fierce \
     netcat-openbsd socat tcpdump \
