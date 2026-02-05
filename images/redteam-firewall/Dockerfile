@@ -12,27 +12,18 @@
 # - 172.16.0.100:8080 → 172.16.1.40:8080 (jenkins)
 #
 # Build: docker build -t cyroid/redteam-firewall:latest .
-# Run: docker run -d --cap-add=NET_ADMIN --cap-add=NET_RAW cyroid/redteam-firewall:latest
+# Size: ~15MB
 
 FROM alpine:3.19
 
-# Install networking tools
+COPY firewall-rules.sh /usr/local/bin/
+COPY entrypoint.sh /
+
 RUN apk add --no-cache \
-    iptables \
-    ip6tables \
-    iproute2 \
-    tcpdump \
-    net-tools \
-    bind-tools \
-    bash \
-    curl \
-    && mkdir -p /etc/iptables
+        iptables \
+        iproute2 \
+        bash \
+    && chmod +x /usr/local/bin/firewall-rules.sh /entrypoint.sh
 
-# Copy firewall configuration script
-COPY firewall-rules.sh /usr/local/bin/firewall-rules.sh
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /usr/local/bin/firewall-rules.sh /entrypoint.sh
-
-# Enable IP forwarding at runtime via entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]
