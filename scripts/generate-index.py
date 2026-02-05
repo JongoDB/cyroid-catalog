@@ -77,10 +77,10 @@ def scan_blueprints() -> list[dict]:
                     requires_images.append(project)
 
         # Check for included content
-        has_msel = (bp_dir / "msel.md").exists()
-        has_content = (bp_dir / "content").exists() and any(
-            (bp_dir / "content").iterdir()
-        )
+        has_msel = (bp_dir / "msel.md").exists() or bool(bp.get("events"))
+        has_content = (
+            (bp_dir / "content").exists() and any((bp_dir / "content").iterdir())
+        ) or (bp_dir / "content.json").exists()
 
         # Extract tags from walkthrough if available
         tags = []

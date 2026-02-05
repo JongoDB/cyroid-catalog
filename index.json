@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-03T18:17:31.751022+00:00"
+    "generated_at": "2026-02-05T18:18:47.574078+00:00"
   },
   "items": [
     {
@@ -45,16 +45,16 @@
         "samba-dc"
       ],
       "includes_msel": false,
-      "includes_content": false,
+      "includes_content": true,
       "checksum": "sha256:92834fda54c53698"
     },
     {
       "id": "red-team-training-lab-v3",
       "type": "blueprint",
       "name": "Red Team Training Lab v3",
-      "description": "Advanced red team training with realistic network segmentation.\n- Realistic firewall/routing between network segments\n- Multiple attack paths (SQLi, Jenkins RCE, VPN credential stuffing)\n- SSH tunneling and proxychains required for lateral movement\n- Enterprise services (wiki, ticketing, VPN) for added realism\n\nPrimary path: SQLi -> SSH pivot -> DMZ exploration -> Internal access -> Domain compromise",
-      "tags": ["red-team", "advanced", "pivoting", "network-segmentation"],
-      "version": "3.0",
+      "description": "Advanced red team training environment with realistic network segmentation.\nUnlike v2, students must pivot through compromised hosts - no shortcuts!\n\nKey Features:\n- Realistic firewall/routing between network segments\n- Multiple attack paths (SQLi, Jenkins RCE, VPN credential stuffing)\n- SSH tunneling and proxychains required for lateral movement\n- Enterprise services (wiki, ticketing, VPN) for added realism\n\nNetwork Segments:\n- Internet: Attacker position, sees only firewall NAT'd services\n- DMZ: Web services, jump box, CI/CD\n- Internal: Domain infrastructure, sensitive data\n\nPrimary Attack Path:\nSQLi \u2192 SSH pivot \u2192 DMZ exploration \u2192 Internal access \u2192 Domain compromise",
+      "tags": [],
+      "version": "1.0",
       "path": "blueprints/red-team-training-lab-v3",
       "requires_images": [
         "kali-attack",
@@ -73,7 +73,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:pending"
+      "checksum": "sha256:544d0d0508ebfc15"
     },
     {
       "id": "apt-intrusion",
@@ -127,7 +127,63 @@
       "path": "images/kali-attack",
       "arch": "x86_64",
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:348c227eb9d4802d"
+      "checksum": "sha256:ec10d1165cf3d9c9"
+    },
+    {
+      "id": "redteam-firewall",
+      "type": "image",
+      "name": "redteam-firewall",
+      "description": "Multi-homed firewall/router for Red Team Training Lab v3.\nProvides NAT and access control between network segments.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-firewall",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:bc2410939e40e02f"
+    },
+    {
+      "id": "redteam-ftp",
+      "type": "image",
+      "name": "redteam-ftp",
+      "description": "FTP server for Red Team Training Lab v3.\nAnonymous access with sensitive files and weak credentials.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-ftp",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:7a5f4358152e2228"
+    },
+    {
+      "id": "redteam-jenkins",
+      "type": "image",
+      "name": "redteam-jenkins",
+      "description": "Vulnerable Jenkins for Red Team Training Lab v3.\nScript Console enabled with weak admin credentials.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-jenkins",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:23d7dd9708ee270a"
+    },
+    {
+      "id": "redteam-jumpbox",
+      "type": "image",
+      "name": "redteam-jumpbox",
+      "description": "Bastion/jump host for Red Team Training Lab v3.\nSSH gateway to internal network with forwarding enabled.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-jumpbox",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:e8c81fb31f91230b"
     },
     {
       "id": "redteam-lab-fileserver",
@@ -155,7 +211,7 @@
       "path": "images/redteam-lab-wordpress",
       "arch": "x86_64",
       "docker_tag": "cyroid/redteam-lab-wordpress:latest",
-      "checksum": "sha256:4ae5fea6f51767a9"
+      "checksum": "sha256:409feeb4b8709523"
     },
     {
       "id": "redteam-lab-workstation",
@@ -172,6 +228,62 @@
       "checksum": "sha256:f85510681a8a8bb1"
     },
     {
+      "id": "redteam-mysql",
+      "type": "image",
+      "name": "redteam-mysql",
+      "description": "MySQL database for Red Team Training Lab v3.\nContains sensitive data with weak root credentials.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-mysql",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:a33b361ed3eaee88"
+    },
+    {
+      "id": "redteam-ticketing",
+      "type": "image",
+      "name": "redteam-ticketing",
+      "description": "IT Ticketing system for Red Team Training Lab v3.\nTickets expose internal processes and credentials.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-ticketing",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:7bfb7cc09ff539b4"
+    },
+    {
+      "id": "redteam-vpn",
+      "type": "image",
+      "name": "redteam-vpn",
+      "description": "OpenVPN gateway for Red Team Training Lab v3.\nDual-homed, accepts credentials found via SQLi.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-vpn",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:f487c0e06b1e3be7"
+    },
+    {
+      "id": "redteam-wiki",
+      "type": "image",
+      "name": "redteam-wiki",
+      "description": "Internal DokuWiki for Red Team Training Lab v3.\nContains sensitive documentation including credentials.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/redteam-wiki",
+      "arch": "x86_64",
+      "docker_tag": "latest",
+      "checksum": "sha256:a7757afe1659c1cf"
+    },
+    {
       "id": "samba-dc",
       "type": "image",
       "name": "Samba Active Directory Domain Controller",
@@ -184,102 +296,6 @@
       "arch": "both",
       "docker_tag": "cyroid/samba-dc:latest",
       "checksum": "sha256:f8def8cd855783b0"
-    },
-    {
-      "id": "redteam-firewall",
-      "type": "image",
-      "name": "Red Team Firewall/Router",
-      "description": "Multi-homed iptables-based firewall for network segmentation. Provides NAT and access control between Internet, DMZ, and Internal networks.",
-      "tags": ["red-team", "network", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-firewall",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-firewall:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-jumpbox",
-      "type": "image",
-      "name": "Red Team Jump Box",
-      "description": "SSH bastion host in DMZ for administrative access to internal network. Credentials: admin/JumpB0x2024!, svc_backup/Backup2024",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-jumpbox",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-jumpbox:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-ftp",
-      "type": "image",
-      "name": "Red Team FTP Server",
-      "description": "vsftpd server with anonymous access and weak credentials. Contains network diagrams and old password files.",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-ftp",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-ftp:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-jenkins",
-      "type": "image",
-      "name": "Red Team Jenkins",
-      "description": "Vulnerable Jenkins CI/CD with Script Console enabled. Credentials: admin/admin (weak!). Alternative RCE path.",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-jenkins",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-jenkins:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-wiki",
-      "type": "image",
-      "name": "Red Team Internal Wiki",
-      "description": "DokuWiki with sensitive IT documentation including network diagrams, service accounts, and emergency credentials.",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-wiki",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-wiki:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-ticketing",
-      "type": "image",
-      "name": "Red Team Ticketing System",
-      "description": "IT helpdesk ticketing system with tickets exposing internal processes, password resets, and service account credentials.",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-ticketing",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-ticketing:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-mysql",
-      "type": "image",
-      "name": "Red Team MySQL Database",
-      "description": "MySQL database with weak root credentials (DBr00t2024!) and sensitive employee/server data tables.",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-mysql",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-mysql:latest",
-      "checksum": "sha256:pending"
-    },
-    {
-      "id": "redteam-vpn",
-      "type": "image",
-      "name": "Red Team VPN Gateway",
-      "description": "OpenVPN server dual-homed on Internet and Internal networks. Accepts credentials found via SQLi for alternative attack path.",
-      "tags": ["red-team", "v3"],
-      "version": "1.0",
-      "path": "images/redteam-vpn",
-      "arch": "both",
-      "docker_tag": "cyroid/redteam-vpn:latest",
-      "checksum": "sha256:pending"
     },
     {
       "id": "windows-server-2019",
