@@ -45,7 +45,7 @@ if ! wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
     wp core install \
         --path=/var/www/html \
         --url="http://$(hostname -I | awk '{print $1}')" \
-        --title="Acme Widgets Inc." \
+        --title="Acme Widgets - Employee Portal" \
         --admin_user="admin" \
         --admin_password="Acme2024!" \
         --admin_email="admin@acmewidgets.local" \
