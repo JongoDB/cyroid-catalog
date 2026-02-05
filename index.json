@@ -72,7 +72,7 @@
         "redteam-mysql"
       ],
       "includes_msel": true,
-      "includes_content": false,
+      "includes_content": true,
       "checksum": "sha256:pending"
     },
     {

@@ -7,9 +7,9 @@
 # - backup:Backup2024 (read-only)
 #
 # Build: docker build -t cyroid/redteam-mysql:latest .
-# Size: ~150MB (vs ~550MB for mysql:8.0)
+# Size: ~400MB (official MariaDB 10.11)
 
-FROM mariadb:10-alpine
+FROM mariadb:10.11
 
 ENV MARIADB_ROOT_PASSWORD=DBr00t2024!
 
