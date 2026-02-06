@@ -31,8 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec samba-common-bin \
     # Password Attacks (online brute-force only)
     hydra medusa \
-    # Wordlists (base package: rockyou + dirb lists)
-    wordlists \
+    # Wordlists (rockyou + dirb/dirbuster directory lists)
+    wordlists dirb \
     # Tunneling & Pivoting
     proxychains4 sshuttle openvpn \
     # Web Application Testing
