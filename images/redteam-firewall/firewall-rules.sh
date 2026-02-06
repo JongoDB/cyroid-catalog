@@ -58,6 +58,10 @@ iptables -t nat -A PREROUTING -d ${NAT_IP} -p tcp --dport 80 \
 iptables -t nat -A PREROUTING -d ${NAT_IP} -p tcp --dport 443 \
     -j DNAT --to-destination ${WEBSERVER}:443
 
+# Webserver SSH (intentional exposure for training -- allows credential-based access)
+iptables -t nat -A PREROUTING -d ${NAT_IP} -p tcp --dport 22 \
+    -j DNAT --to-destination ${WEBSERVER}:22
+
 # Jenkins
 iptables -t nat -A PREROUTING -d ${NAT_IP} -p tcp --dport 8080 \
     -j DNAT --to-destination ${JENKINS}:8080
