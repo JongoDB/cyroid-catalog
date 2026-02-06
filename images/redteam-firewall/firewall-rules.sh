@@ -104,6 +104,13 @@ iptables -A FORWARD -s ${JENKINS} -d ${FILESERVER} -p tcp --dport 445 -j ACCEPT
 iptables -A FORWARD -s ${INTERNAL_NET} -d ${JUMPBOX} -p tcp --dport 22 -j ACCEPT
 
 # ============================================================================
+# DMZ → Internet (Outbound - intentional misconfiguration for training)
+# ============================================================================
+# In many real environments, DMZ servers can initiate outbound connections.
+# This allows reverse shells back to the attacker - a common attack vector.
+iptables -A FORWARD -s ${DMZ_NET} -d ${INTERNET_NET} -j ACCEPT
+
+# ============================================================================
 # DMZ ↔ DMZ (Allow within segment)
 # ============================================================================
 iptables -A FORWARD -s ${DMZ_NET} -d ${DMZ_NET} -j ACCEPT

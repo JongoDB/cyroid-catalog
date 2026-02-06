@@ -15,13 +15,15 @@
 
 FROM python:3.12-alpine
 
-RUN apk add --no-cache bash curl netcat-openbsd \
+RUN apk add --no-cache bash curl netcat-openbsd iproute2 \
     && pip install --no-cache-dir flask
 
 WORKDIR /app
 COPY app.py /app/
 COPY templates/ /app/templates/
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8080
 
-CMD ["python", "app.py"]
+CMD ["/app/entrypoint.sh"]
