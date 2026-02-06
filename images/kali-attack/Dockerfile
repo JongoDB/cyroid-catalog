@@ -48,41 +48,50 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # === LAYER 2: Tool downloads (not in Kali repos) ===
-RUN mkdir -p /opt/tools/peas /opt/tools/binaries && \
+# Uses wget with retries and visible errors to survive transient GitHub failures.
+# GitHub API version lookups have pinned fallbacks to avoid rate-limit breakage.
+RUN set -e && mkdir -p /opt/tools/peas /opt/tools/binaries && \
     ARCH=$(uname -m) && \
+    # Helper: wget with retries (3 attempts, 5s between retries, errors visible)
+    dl() { wget --tries=3 --waitretry=5 --retry-connrefused -nv "$@"; } && \
+    # Helper: resolve latest GitHub release tag, with fallback
+    gh_version() { \
+        VER=$(curl -sS --retry 3 --retry-delay 5 "https://api.github.com/repos/$1/releases/latest" 2>/dev/null | grep tag_name | cut -d'"' -f4 || true); \
+        if [ -n "$VER" ]; then echo "$VER"; else echo "WARNING: GitHub API failed for $1, using fallback $2" >&2; echo "$2"; fi; \
+    } && \
     # Kerbrute
     if [ "$ARCH" = "x86_64" ]; then \
-        wget -q https://github.com/ropnop/kerbrute/releases/latest/download/kerbrute_linux_amd64 -O /usr/local/bin/kerbrute && \
+        dl https://github.com/ropnop/kerbrute/releases/latest/download/kerbrute_linux_amd64 -O /usr/local/bin/kerbrute && \
         chmod +x /usr/local/bin/kerbrute; \
     fi && \
-    # Chisel
-    CHISEL_VERSION=$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | grep tag_name | cut -d'"' -f4) && \
+    # Chisel (fallback: v1.11.3)
+    CHISEL_VERSION=$(gh_version jpillora/chisel v1.11.3) && \
     if [ "$ARCH" = "x86_64" ]; then \
-        wget -q "https://github.com/jpillora/chisel/releases/download/${CHISEL_VERSION}/chisel_${CHISEL_VERSION#v}_linux_amd64.gz" -O /tmp/chisel.gz; \
+        dl "https://github.com/jpillora/chisel/releases/download/${CHISEL_VERSION}/chisel_${CHISEL_VERSION#v}_linux_amd64.gz" -O /tmp/chisel.gz; \
     elif [ "$ARCH" = "aarch64" ]; then \
-        wget -q "https://github.com/jpillora/chisel/releases/download/${CHISEL_VERSION}/chisel_${CHISEL_VERSION#v}_linux_arm64.gz" -O /tmp/chisel.gz; \
+        dl "https://github.com/jpillora/chisel/releases/download/${CHISEL_VERSION}/chisel_${CHISEL_VERSION#v}_linux_arm64.gz" -O /tmp/chisel.gz; \
     fi && \
     if [ -f /tmp/chisel.gz ]; then gunzip /tmp/chisel.gz && mv /tmp/chisel /usr/local/bin/chisel && chmod +x /usr/local/bin/chisel; fi && \
-    # Ligolo-ng
-    LIGOLO_VERSION=$(curl -s https://api.github.com/repos/nicocha30/ligolo-ng/releases/latest | grep tag_name | cut -d'"' -f4) && \
+    # Ligolo-ng (fallback: v0.8.2)
+    LIGOLO_VERSION=$(gh_version nicocha30/ligolo-ng v0.8.2) && \
     if [ "$ARCH" = "x86_64" ]; then \
-        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_agent_${LIGOLO_VERSION#v}_linux_amd64.tar.gz" -O /tmp/ligolo.tar.gz; \
+        dl "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_agent_${LIGOLO_VERSION#v}_linux_amd64.tar.gz" -O /tmp/ligolo.tar.gz; \
     elif [ "$ARCH" = "aarch64" ]; then \
-        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_agent_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo.tar.gz; \
+        dl "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_agent_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo.tar.gz; \
     fi && \
     if [ -f /tmp/ligolo.tar.gz ]; then tar -xzf /tmp/ligolo.tar.gz -C /opt/tools/binaries/ && rm /tmp/ligolo.tar.gz && ln -sf /opt/tools/binaries/agent /usr/local/bin/ligolo-agent; fi && \
     # Ligolo-ng proxy (server component, runs on Kali)
     if [ "$ARCH" = "x86_64" ]; then \
-        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_amd64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
+        dl "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_amd64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
     elif [ "$ARCH" = "aarch64" ]; then \
-        wget -q "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
+        dl "https://github.com/nicocha30/ligolo-ng/releases/download/${LIGOLO_VERSION}/ligolo-ng_proxy_${LIGOLO_VERSION#v}_linux_arm64.tar.gz" -O /tmp/ligolo-proxy.tar.gz; \
     fi && \
     if [ -f /tmp/ligolo-proxy.tar.gz ]; then tar -xzf /tmp/ligolo-proxy.tar.gz -C /opt/tools/binaries/ && rm /tmp/ligolo-proxy.tar.gz && ln -sf /opt/tools/binaries/proxy /usr/local/bin/ligolo-proxy; fi && \
     # PEAS
-    wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh -O /opt/tools/peas/linpeas.sh && \
-    wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe -O /opt/tools/peas/winpeas64.exe && \
-    wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx86.exe -O /opt/tools/peas/winpeas32.exe && \
-    wget -q https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64 -O /opt/tools/peas/linpeas_amd64 && \
+    dl https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh -O /opt/tools/peas/linpeas.sh && \
+    dl https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe -O /opt/tools/peas/winpeas64.exe && \
+    dl https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx86.exe -O /opt/tools/peas/winpeas32.exe && \
+    dl https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64 -O /opt/tools/peas/linpeas_amd64 && \
     chmod +x /opt/tools/peas/linpeas.sh /opt/tools/peas/linpeas_amd64
 
 # === LAYER 3: Config + wordlist prep ===
