@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-06T19:21:44.267478+00:00"
+    "generated_at": "2026-02-06T19:31:59.317792+00:00"
   },
   "items": [
     {
@@ -73,7 +73,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:8048f1299a936aa8"
+      "checksum": "sha256:2ed40eb1c841b4d6"
     },
     {
       "id": "apt-intrusion",
@@ -130,7 +130,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:95a4fd20dd1d316a"
+      "checksum": "sha256:d51427f961dd810d"
     },
     {
       "id": "redteam-firewall",
@@ -144,7 +144,7 @@
       "path": "images/redteam-firewall",
       "arch": "x86_64",
       "docker_tag": "latest",
-      "checksum": "sha256:b12e7f9ef84f27fb"
+      "checksum": "sha256:94a2775b5cabd065"
     },
     {
       "id": "redteam-ftp",
