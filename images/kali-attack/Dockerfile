@@ -41,6 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     aircrack-ng \
     # Database & Service Clients
     default-mysql-client ftp \
+    # Browser
+    firefox-esr \
     # Utilities
     curl wget git vim tmux jq tree python3-pip python3-venv zsh fzf ripgrep \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
