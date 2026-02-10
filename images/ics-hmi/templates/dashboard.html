@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ hmi_name }} - SCADA HMI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #1a1a2e; color: #e0e0e0; font-family: 'Courier New', monospace; }
+        .header { background: #16213e; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f3460; }
+        .header h1 { color: #00d4ff; font-size: 18px; }
+        .header .role { color: #e94560; font-size: 14px; text-transform: uppercase; }
+        .header .status { color: #4caf50; font-size: 12px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 16px; padding: 16px; }
+        .plc-card { background: #16213e; border: 1px solid #0f3460; border-radius: 8px; padding: 16px; }
+        .plc-card h2 { color: #00d4ff; font-size: 14px; margin-bottom: 8px; border-bottom: 1px solid #0f3460; padding-bottom: 6px; }
+        .plc-card .proto { color: #e94560; font-size: 11px; float: right; }
+        .register { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1a1a2e; }
+        .register .name { color: #a0a0a0; font-size: 12px; }
+        .register .value { color: #4caf50; font-size: 13px; font-weight: bold; }
+        .register .value.alarm { color: #e94560; }
+        .no-data { color: #666; text-align: center; padding: 40px; font-size: 14px; }
+        .refresh-bar { text-align: center; padding: 8px; color: #555; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ hmi_name }}</h1>
+        <span class="role">{{ hmi_role }} Operations</span>
+        <span class="status" id="conn-status">CONNECTING...</span>
+    </div>
+
+    <div class="grid" id="plc-grid">
+        {% if plc_data %}
+            {% for name, plc in plc_data.items() %}
+            <div class="plc-card">
+                <h2>{{ name }} <span class="proto">{{ plc.protocol | upper }}</span></h2>
+                {% for reg_name, reg_val in plc.values.items() %}
+                <div class="register">
+                    <span class="name">{{ reg_name }}</span>
+                    <span class="value">{{ reg_val }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">
+                Waiting for PLC data...<br>
+                {% if plc_targets %}
+                    Configured targets: {{ plc_targets | length }} PLCs
+                {% else %}
+                    No PLC targets configured. Set PLC_TARGETS environment variable.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="refresh-bar">Auto-refresh every 2s | {{ hmi_name }} | CYROID ICS Range</div>
+
+    <script>
+        function refreshData() {
+            fetch('/api/data')
+                .then(r => r.json())
+                .then(data => {
+                    const grid = document.getElementById('plc-grid');
+                    const status = document.getElementById('conn-status');
+                    if (Object.keys(data).length === 0) {
+                        status.textContent = 'NO DATA';
+                        status.style.color = '#e94560';
+                        return;
+                    }
+                    status.textContent = 'ONLINE';
+                    status.style.color = '#4caf50';
+                    let html = '';
+                    for (const [name, plc] of Object.entries(data)) {
+                        html += `<div class="plc-card"><h2>${name} <span class="proto">${plc.protocol.toUpperCase()}</span></h2>`;
+                        for (const [reg, val] of Object.entries(plc.values)) {
+                            html += `<div class="register"><span class="name">${reg}</span><span class="value">${typeof val === 'number' ? val.toFixed(2) : val}</span></div>`;
+                        }
+                        html += '</div>';
+                    }
+                    grid.innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('conn-status').textContent = 'ERROR';
+                    document.getElementById('conn-status').style.color = '#e94560';
+                });
+        }
+        setInterval(refreshData, 2000);
+        refreshData();
+    </script>
+</body>
+</html>

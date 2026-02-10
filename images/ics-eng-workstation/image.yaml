@@ -1,0 +1,10 @@
+name: ICS OT Engineering Workstation
+tag: "cyroid/ics-eng-workstation:latest"
+description: |
+  OT engineering workstation with KasmVNC desktop and ICS-specific tools.
+  Includes Modbus/OPC UA/EtherNet-IP clients, Wireshark with ICS dissectors,
+  Nmap with ICS scripts, and Python ICS libraries for PLC interaction.
+arch:
+  - x86_64
+  - arm64
+category: ics

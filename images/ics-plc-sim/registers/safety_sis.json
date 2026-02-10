@@ -1,0 +1,21 @@
+{
+  "description": "Safety Instrumented System - SIS (plc-safety)",
+  "holding_registers": [
+    {"address": 0, "name": "SIS_Armed", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 1, "name": "Overspeed_Trip_Enabled", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 2, "name": "Overspeed_Trip_RPM", "default": 3780, "min": 3600, "max": 4000, "noise": 0, "writable": true, "simulate": false},
+    {"address": 3, "name": "Generator_Prot_Enabled", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 4, "name": "Overcurrent_Prot_Enabled", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 5, "name": "Overtemp_Prot_Enabled", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 6, "name": "Overtemp_Trip_C", "default": 130, "min": 80, "max": 200, "noise": 0, "writable": true, "simulate": false},
+    {"address": 10, "name": "Emergency_Stop_Status", "default": 0, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 11, "name": "Manual_Trip_Status", "default": 0, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 20, "name": "Turbine_Speed_RPM", "default": 3600, "min": 0, "max": 4500, "noise": 0.002, "writable": false, "simulate": true},
+    {"address": 21, "name": "Generator_Current_A", "default": 6280, "min": 0, "max": 15000, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 22, "name": "Stator_Temp_C", "default": 85, "min": 20, "max": 200, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 23, "name": "Bearing_Vibration_mm_s", "default": 2.1, "min": 0, "max": 20, "noise": 0.05, "writable": false, "simulate": true},
+    {"address": 30, "name": "Last_Trip_Code", "default": 0, "min": 0, "max": 99, "noise": 0, "writable": false, "simulate": false},
+    {"address": 31, "name": "Total_Trip_Count", "default": 3, "min": 0, "max": 9999, "noise": 0, "writable": false, "simulate": false},
+    {"address": 32, "name": "SIS_Diagnostic_Status", "default": 0, "min": 0, "max": 255, "noise": 0, "writable": false, "simulate": false}
+  ]
+}

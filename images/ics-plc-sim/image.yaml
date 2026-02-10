@@ -1,0 +1,11 @@
+name: ICS PLC Simulator
+tag: "cyroid/ics-plc-sim:latest"
+description: |
+  Universal ICS PLC simulator for cyber range training.
+  Supports Modbus TCP (port 502), OPC UA (port 4840), and EtherNet/IP (port 44818).
+  Protocol and register map configured via environment variables.
+  Simulates realistic power grid process values with drift and noise.
+arch:
+  - x86_64
+  - arm64
+category: ics

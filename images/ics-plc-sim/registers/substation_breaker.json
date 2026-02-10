@@ -1,0 +1,18 @@
+{
+  "description": "Substation B - Breaker Controller (plc-sub-b)",
+  "holding_registers": [
+    {"address": 0, "name": "Breaker_1_Status", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 1, "name": "Breaker_2_Status", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 2, "name": "Breaker_3_Status", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 3, "name": "Bus_Tie_Status", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 10, "name": "Bus_A_Voltage_kV", "default": 69.0, "min": 0, "max": 80, "noise": 0.005, "writable": false, "simulate": true},
+    {"address": 11, "name": "Bus_B_Voltage_kV", "default": 69.0, "min": 0, "max": 80, "noise": 0.005, "writable": false, "simulate": true},
+    {"address": 12, "name": "Bus_A_Current_A", "default": 320.0, "min": 0, "max": 1000, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 13, "name": "Bus_B_Current_A", "default": 280.0, "min": 0, "max": 1000, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 20, "name": "Cap_Bank_1_Status", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 21, "name": "Cap_Bank_2_Status", "default": 0, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 30, "name": "Breaker_1_Op_Count", "default": 1247, "min": 0, "max": 99999, "noise": 0, "writable": false, "simulate": false},
+    {"address": 31, "name": "Breaker_2_Op_Count", "default": 892, "min": 0, "max": 99999, "noise": 0, "writable": false, "simulate": false},
+    {"address": 40, "name": "Temperature_C", "default": 35, "min": -20, "max": 80, "noise": 0.02, "writable": false, "simulate": true}
+  ]
+}

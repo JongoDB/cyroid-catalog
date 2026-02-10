@@ -1,0 +1,20 @@
+{
+  "description": "Load Management Controller (plc-load)",
+  "holding_registers": [
+    {"address": 0, "name": "Total_Load_MW", "default": 420.0, "min": 100, "max": 800, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 1, "name": "Total_Generation_MW", "default": 435.0, "min": 100, "max": 800, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 2, "name": "System_Frequency_Hz", "default": 60.0, "min": 55, "max": 65, "noise": 0.001, "writable": false, "simulate": true},
+    {"address": 3, "name": "Reserve_Margin_MW", "default": 15.0, "min": -50, "max": 100, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 10, "name": "Load_Shed_Stage_1_MW", "default": 50, "min": 10, "max": 200, "noise": 0, "writable": true, "simulate": false},
+    {"address": 11, "name": "Load_Shed_Stage_2_MW", "default": 100, "min": 10, "max": 300, "noise": 0, "writable": true, "simulate": false},
+    {"address": 12, "name": "Load_Shed_Stage_3_MW", "default": 150, "min": 10, "max": 400, "noise": 0, "writable": true, "simulate": false},
+    {"address": 13, "name": "Freq_Trigger_Stage1_Hz", "default": 59, "min": 57, "max": 60, "noise": 0, "writable": true, "simulate": false},
+    {"address": 14, "name": "Freq_Trigger_Stage2_Hz", "default": 58, "min": 56, "max": 59, "noise": 0, "writable": true, "simulate": false},
+    {"address": 20, "name": "Auto_Shed_Enabled", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 21, "name": "Demand_Response_Active", "default": 0, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 30, "name": "Feeder_1_Load_MW", "default": 85.0, "min": 0, "max": 200, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 31, "name": "Feeder_2_Load_MW", "default": 120.0, "min": 0, "max": 200, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 32, "name": "Feeder_3_Load_MW", "default": 95.0, "min": 0, "max": 200, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 33, "name": "Feeder_4_Load_MW", "default": 120.0, "min": 0, "max": 200, "noise": 0.02, "writable": false, "simulate": true}
+  ]
+}

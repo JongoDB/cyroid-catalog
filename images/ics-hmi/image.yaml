@@ -1,0 +1,11 @@
+name: ICS SCADA HMI
+tag: "cyroid/ics-hmi:latest"
+description: |
+  Web-based SCADA HMI dashboard for power grid monitoring.
+  Polls PLCs via Modbus TCP, OPC UA, or EtherNet/IP and renders
+  real-time process values with gauges, indicators, and trend charts.
+  Configurable for substation, generation, or grid overview roles.
+arch:
+  - x86_64
+  - arm64
+category: ics

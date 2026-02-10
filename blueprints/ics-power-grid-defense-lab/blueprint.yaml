@@ -219,7 +219,7 @@ vms:
 
   # Read-only historian mirror (provides OT data to business network)
   - hostname: hist-mirror
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-historian:latest"
     network_interfaces:
       - network_name: it-ot-dmz
         ip_address: "172.16.2.20"
@@ -236,7 +236,7 @@ vms:
 
   # OT firewall (routes IT/OT DMZ <-> operations <-> supervisory <-> process-control)
   - hostname: ot-firewall
-    base_image_tag: "127.0.0.1:5000/cyroid/redteam-firewall:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-ot-firewall:latest"
     network_interfaces:
       - network_name: it-ot-dmz
         ip_address: "172.16.2.254"
@@ -259,7 +259,7 @@ vms:
 
   # Process data historian (collects from all PLCs via OPC UA gateway)
   - hostname: historian
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-historian:latest"
     network_interfaces:
       - network_name: operations
         ip_address: "172.16.3.10"
@@ -272,7 +272,7 @@ vms:
 
   # OT engineering workstation (PLC programming, firmware updates)
   - hostname: eng-ws-ot
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-eng-workstation:latest"
     network_interfaces:
       - network_name: operations
         ip_address: "172.16.3.20"
@@ -289,7 +289,7 @@ vms:
 
   # HMI 1: Substation Operations - monitors breakers and protection relays
   - hostname: hmi-sub
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-hmi:latest"
     network_interfaces:
       - network_name: supervisory
         ip_address: "172.16.4.10"
@@ -304,7 +304,7 @@ vms:
 
   # HMI 2: Generation Plant Control - turbine and generator monitoring
   - hostname: hmi-gen
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-hmi:latest"
     network_interfaces:
       - network_name: supervisory
         ip_address: "172.16.4.20"
@@ -319,7 +319,7 @@ vms:
 
   # HMI 3: Grid Overview / Energy Management System display
   - hostname: hmi-grid
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-hmi:latest"
     network_interfaces:
       - network_name: supervisory
         ip_address: "172.16.4.30"
@@ -337,7 +337,7 @@ vms:
   # PLC 1: Substation A - Protection Relay Controller (DNP3)
   # Monitors overcurrent, distance protection, auto-reclosing
   - hostname: plc-sub-a
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
     network_interfaces:
       - network_name: process-control
         ip_address: "172.16.5.10"
@@ -351,7 +351,7 @@ vms:
   # PLC 2: Substation B - Breaker Controller (Modbus TCP)
   # Controls circuit breakers, bus-tie switching, capacitor banks
   - hostname: plc-sub-b
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
     network_interfaces:
       - network_name: process-control
         ip_address: "172.16.5.20"
@@ -365,7 +365,7 @@ vms:
   # PLC 3: Generation Plant - Turbine Governor Controller (EtherNet/IP)
   # Controls turbine speed, generator output, excitation
   - hostname: plc-gen
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
     network_interfaces:
       - network_name: process-control
         ip_address: "172.16.5.30"
@@ -379,7 +379,7 @@ vms:
   # PLC 4: Load Management Controller (Modbus TCP)
   # Automatic load shedding, demand response, frequency regulation
   - hostname: plc-load
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
     network_interfaces:
       - network_name: process-control
         ip_address: "172.16.5.40"
@@ -393,7 +393,7 @@ vms:
   # PLC 5: Safety Instrumented System - SIS (OPC UA)
   # Emergency shutdown, overspeed trip, generator protection
   - hostname: plc-safety
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
     network_interfaces:
       - network_name: process-control
         ip_address: "172.16.5.50"
@@ -407,7 +407,7 @@ vms:
   # RTU: Distribution Network - Remote Terminal Unit (DNP3)
   # Monitors distribution feeders, reclosers, voltage regulators
   - hostname: rtu-dist
-    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
     network_interfaces:
       - network_name: process-control
         ip_address: "172.16.5.60"

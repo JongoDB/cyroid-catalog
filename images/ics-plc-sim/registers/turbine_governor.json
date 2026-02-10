@@ -1,0 +1,20 @@
+{
+  "description": "Generation Plant - Turbine Governor Controller (plc-gen)",
+  "holding_registers": [
+    {"address": 0, "name": "Turbine_Speed_RPM", "default": 3600, "min": 0, "max": 4000, "noise": 0.002, "writable": false, "simulate": true},
+    {"address": 1, "name": "Generator_Output_MW", "default": 150.0, "min": 0, "max": 250, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 2, "name": "Generator_Voltage_kV", "default": 13.8, "min": 0, "max": 16, "noise": 0.003, "writable": false, "simulate": true},
+    {"address": 3, "name": "Generator_Current_A", "default": 6280.0, "min": 0, "max": 12000, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 4, "name": "Frequency_Hz", "default": 60.0, "min": 55, "max": 65, "noise": 0.001, "writable": false, "simulate": true},
+    {"address": 10, "name": "Speed_Setpoint_RPM", "default": 3600, "min": 3000, "max": 3900, "noise": 0, "writable": true, "simulate": false},
+    {"address": 11, "name": "Power_Setpoint_MW", "default": 150, "min": 0, "max": 250, "noise": 0, "writable": true, "simulate": false},
+    {"address": 12, "name": "Voltage_Setpoint_kV", "default": 13, "min": 10, "max": 16, "noise": 0, "writable": true, "simulate": false},
+    {"address": 20, "name": "Governor_Mode", "default": 1, "min": 0, "max": 3, "noise": 0, "writable": true, "simulate": false},
+    {"address": 21, "name": "Exciter_Mode", "default": 1, "min": 0, "max": 2, "noise": 0, "writable": true, "simulate": false},
+    {"address": 30, "name": "Bearing_Temp_C", "default": 72.0, "min": 20, "max": 120, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 31, "name": "Stator_Temp_C", "default": 85.0, "min": 20, "max": 150, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 32, "name": "Lube_Oil_Pressure_PSI", "default": 45.0, "min": 10, "max": 80, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 33, "name": "Vibration_mm_s", "default": 2.1, "min": 0, "max": 15, "noise": 0.05, "writable": false, "simulate": true},
+    {"address": 40, "name": "Run_Hours", "default": 48520, "min": 0, "max": 999999, "noise": 0, "writable": false, "simulate": false}
+  ]
+}

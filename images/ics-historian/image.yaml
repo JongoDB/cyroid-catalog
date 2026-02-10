@@ -1,0 +1,10 @@
+name: ICS Process Historian
+tag: "cyroid/ics-historian:latest"
+description: |
+  Process data historian that polls all PLCs and stores time-series data.
+  Provides a web interface for viewing historical trends and a REST API
+  for querying process data. Uses SQLite for lightweight storage.
+arch:
+  - x86_64
+  - arm64
+category: ics

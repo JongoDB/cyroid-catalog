@@ -1,0 +1,18 @@
+{
+  "description": "Substation A - Protection Relay Controller (plc-sub-a)",
+  "holding_registers": [
+    {"address": 0, "name": "Bus_Voltage_kV", "default": 138.0, "min": 0, "max": 160, "noise": 0.005, "writable": false, "simulate": true},
+    {"address": 1, "name": "Line_Current_A", "default": 450.0, "min": 0, "max": 2000, "noise": 0.02, "writable": false, "simulate": true},
+    {"address": 2, "name": "Frequency_Hz", "default": 60.0, "min": 55, "max": 65, "noise": 0.001, "writable": false, "simulate": true},
+    {"address": 3, "name": "Power_Factor", "default": 95, "min": 70, "max": 100, "noise": 0.005, "writable": false, "simulate": true},
+    {"address": 10, "name": "Overcurrent_Trip_A", "default": 1200, "min": 100, "max": 5000, "noise": 0, "writable": true, "simulate": false},
+    {"address": 11, "name": "Distance_Prot_Zone1_Ohm", "default": 15, "min": 1, "max": 100, "noise": 0, "writable": true, "simulate": false},
+    {"address": 12, "name": "Distance_Prot_Zone2_Ohm", "default": 25, "min": 1, "max": 200, "noise": 0, "writable": true, "simulate": false},
+    {"address": 20, "name": "Autorecloser_Enabled", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 21, "name": "Autorecloser_Delay_ms", "default": 500, "min": 100, "max": 5000, "noise": 0, "writable": true, "simulate": false},
+    {"address": 30, "name": "Protection_Status", "default": 1, "min": 0, "max": 1, "noise": 0, "writable": true, "simulate": false},
+    {"address": 31, "name": "Trip_Count", "default": 0, "min": 0, "max": 9999, "noise": 0, "writable": false, "simulate": false},
+    {"address": 40, "name": "Real_Power_MW", "default": 85.0, "min": 0, "max": 200, "noise": 0.01, "writable": false, "simulate": true},
+    {"address": 41, "name": "Reactive_Power_MVAR", "default": 22.0, "min": -50, "max": 100, "noise": 0.02, "writable": false, "simulate": true}
+  ]
+}

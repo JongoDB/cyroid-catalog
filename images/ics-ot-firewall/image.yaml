@@ -1,0 +1,12 @@
+name: ICS OT Zone Firewall
+tag: "cyroid/ics-ot-firewall:latest"
+description: |
+  OT perimeter firewall enforcing Purdue Model zone segmentation.
+  Allows ICS protocols (Modbus TCP 502, OPC UA 4840, EtherNet/IP 44818)
+  only between authorized pairs (HMI->PLC, historian->PLC).
+  Blocks all unauthorized cross-zone traffic.
+container_config:
+  privileged: true
+  cap_add:
+    - NET_ADMIN
+    - NET_RAW
