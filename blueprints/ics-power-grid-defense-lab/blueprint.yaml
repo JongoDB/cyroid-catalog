@@ -1,0 +1,734 @@
+# CYROID ICS/SCADA Power Grid Defense Lab Blueprint
+# Full Purdue Model (IEC 62443) - Electric Power Grid
+# Protocols: Modbus TCP, DNP3, EtherNet/IP, OPC UA
+# Attack Chain: Full IT-to-OT Kill Chain (MITRE ATT&CK for ICS)
+seed_id: ics-power-grid-defense-lab
+name: ICS Power Grid Defense Lab
+description: |
+  ICS/SCADA defensive training environment for network security operations teams.
+  Simulates an electric power grid with full Purdue Model segmentation (L0-L5).
+
+  Trains defenders to detect and respond to a full IT-to-OT kill chain attack
+  targeting industrial control systems managing power generation, transmission,
+  and distribution infrastructure.
+
+  Purdue Model Network Zones:
+  - L5 Internet: External attacker simulation
+  - L4 Enterprise: Corporate IT (DC, email, engineer workstation)
+  - L3.5 IT/OT DMZ: Jump host, historian mirror, data diode
+  - L3 Operations: Site historian, OT engineering workstation
+  - L2 Supervisory: HMI consoles, SCADA displays
+  - L1/L0 Process Control: PLCs, RTUs, field devices
+  - SOC: IDS/SIEM sensors with monitor-mode on OT zones
+
+  Industrial Protocols:
+  - Modbus TCP (PLCs: Substation B breaker, Load management)
+  - DNP3 (PLCs: Substation A protection relay, Distribution RTU)
+  - EtherNet/IP / CIP (PLC: Turbine governor)
+  - OPC UA (PLC: Safety instrumented system, OPC gateway)
+
+  Defensive Capabilities:
+  - Suricata IDS with ICS rulesets (ET ICS, Quickdraw SCADA)
+  - Wazuh SIEM with OT-specific log correlation
+  - Traffic mirroring on IT/OT DMZ, Supervisory, and Process Control networks
+  - Full PCAP capture on all mirrored zones
+  - Detection scoring with MITRE ATT&CK for ICS mapping
+  - IOC submission and grading
+  - Threat hunting and forensic analysis workflows
+
+  Red Team (Automated Injects - Full Kill Chain):
+  - IT reconnaissance and spearphishing
+  - Active Directory credential harvesting
+  - IT-to-OT pivot via jump host
+  - OT protocol scanning and enumeration
+  - HMI screen manipulation
+  - PLC register/setpoint modification
+  - Safety system bypass attempt
+
+version: "1.0"
+base_subnet_prefix: "172.16"
+
+networks:
+  # L5 - External / Internet
+  - name: internet
+    subnet: "172.16.0.0/24"
+    gateway: "172.16.0.1"
+    is_isolated: false
+    internet_enabled: true
+    enable_traffic_mirror: false
+
+  # L4 - Enterprise / Corporate IT
+  - name: enterprise
+    subnet: "172.16.1.0/24"
+    gateway: "172.16.1.1"
+    is_isolated: true
+    internet_enabled: false
+    enable_traffic_mirror: true
+
+  # L3.5 - IT/OT DMZ
+  - name: it-ot-dmz
+    subnet: "172.16.2.0/24"
+    gateway: "172.16.2.1"
+    is_isolated: true
+    internet_enabled: false
+    enable_traffic_mirror: true
+
+  # L3 - Site Operations
+  - name: operations
+    subnet: "172.16.3.0/24"
+    gateway: "172.16.3.1"
+    is_isolated: true
+    internet_enabled: false
+    enable_traffic_mirror: true
+
+  # L2 - Supervisory / HMI
+  - name: supervisory
+    subnet: "172.16.4.0/24"
+    gateway: "172.16.4.1"
+    is_isolated: true
+    internet_enabled: false
+    enable_traffic_mirror: true
+
+  # L1/L0 - Process Control / Field Devices
+  - name: process-control
+    subnet: "172.16.5.0/24"
+    gateway: "172.16.5.1"
+    is_isolated: true
+    internet_enabled: false
+    enable_traffic_mirror: true
+
+  # SOC - Security Operations Center
+  - name: soc
+    subnet: "172.16.6.0/24"
+    gateway: "172.16.6.1"
+    is_isolated: true
+    internet_enabled: false
+    enable_traffic_mirror: false
+
+vms:
+  # ============================================================
+  # L5 - INTERNET (External)
+  # ============================================================
+
+  # Red team attacker (automated inject source)
+  - hostname: attacker
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: internet
+        ip_address: "172.16.0.10"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 50
+    position_y: 300
+
+  # ============================================================
+  # L4/L5 BOUNDARY - Enterprise Perimeter Firewall
+  # ============================================================
+
+  # Enterprise perimeter firewall (routes internet <-> enterprise <-> IT/OT DMZ)
+  - hostname: ent-firewall
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-firewall:latest"
+    network_interfaces:
+      - network_name: internet
+        ip_address: "172.16.0.1"
+        is_primary: true
+      - network_name: enterprise
+        ip_address: "172.16.1.1"
+      - network_name: it-ot-dmz
+        ip_address: "172.16.2.1"
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 200
+    position_y: 300
+
+  # ============================================================
+  # L4 - ENTERPRISE / CORPORATE IT
+  # ============================================================
+
+  # Active Directory domain controller
+  - hostname: dc01
+    base_image_tag: "127.0.0.1:5000/cyroid/samba-dc:latest"
+    network_interfaces:
+      - network_name: enterprise
+        ip_address: "172.16.1.10"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 350
+    position_y: 100
+
+  # Corporate email server (spearphish target delivery)
+  - hostname: mail-srv
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: enterprise
+        ip_address: "172.16.1.20"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 350
+    position_y: 200
+
+  # Control systems engineer corporate workstation (phishing victim)
+  - hostname: eng-ws
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-workstation:latest"
+    network_interfaces:
+      - network_name: enterprise
+        ip_address: "172.16.1.30"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 350
+    position_y: 300
+
+  # Corporate intranet / web portal
+  - hostname: corp-web
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-lab-wordpress:latest"
+    network_interfaces:
+      - network_name: enterprise
+        ip_address: "172.16.1.40"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 350
+    position_y: 400
+
+  # ============================================================
+  # L3.5 - IT/OT DMZ
+  # ============================================================
+
+  # Authorized jump host for IT-to-OT access (critical pivot point)
+  - hostname: jump-host
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: it-ot-dmz
+        ip_address: "172.16.2.10"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 500
+    position_y: 200
+
+  # Read-only historian mirror (provides OT data to business network)
+  - hostname: hist-mirror
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: it-ot-dmz
+        ip_address: "172.16.2.20"
+        is_primary: true
+    cpu: 1
+    ram_mb: 1024
+    disk_gb: 10
+    position_x: 500
+    position_y: 400
+
+  # ============================================================
+  # L3/L3.5 BOUNDARY - OT Perimeter Firewall
+  # ============================================================
+
+  # OT firewall (routes IT/OT DMZ <-> operations <-> supervisory <-> process-control)
+  - hostname: ot-firewall
+    base_image_tag: "127.0.0.1:5000/cyroid/redteam-firewall:latest"
+    network_interfaces:
+      - network_name: it-ot-dmz
+        ip_address: "172.16.2.254"
+        is_primary: true
+      - network_name: operations
+        ip_address: "172.16.3.1"
+      - network_name: supervisory
+        ip_address: "172.16.4.1"
+      - network_name: process-control
+        ip_address: "172.16.5.1"
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 650
+    position_y: 300
+
+  # ============================================================
+  # L3 - SITE OPERATIONS
+  # ============================================================
+
+  # Process data historian (collects from all PLCs via OPC UA gateway)
+  - hostname: historian
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: operations
+        ip_address: "172.16.3.10"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 800
+    position_y: 200
+
+  # OT engineering workstation (PLC programming, firmware updates)
+  - hostname: eng-ws-ot
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: operations
+        ip_address: "172.16.3.20"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 800
+    position_y: 400
+
+  # ============================================================
+  # L2 - SUPERVISORY / HMI
+  # ============================================================
+
+  # HMI 1: Substation Operations - monitors breakers and protection relays
+  - hostname: hmi-sub
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: supervisory
+        ip_address: "172.16.4.10"
+        is_primary: true
+      - network_name: process-control
+        ip_address: "172.16.5.100"
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 950
+    position_y: 100
+
+  # HMI 2: Generation Plant Control - turbine and generator monitoring
+  - hostname: hmi-gen
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: supervisory
+        ip_address: "172.16.4.20"
+        is_primary: true
+      - network_name: process-control
+        ip_address: "172.16.5.101"
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 950
+    position_y: 300
+
+  # HMI 3: Grid Overview / Energy Management System display
+  - hostname: hmi-grid
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: supervisory
+        ip_address: "172.16.4.30"
+        is_primary: true
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 950
+    position_y: 500
+
+  # ============================================================
+  # L1/L0 - PROCESS CONTROL / FIELD DEVICES
+  # ============================================================
+
+  # PLC 1: Substation A - Protection Relay Controller (DNP3)
+  # Monitors overcurrent, distance protection, auto-reclosing
+  - hostname: plc-sub-a
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: process-control
+        ip_address: "172.16.5.10"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 1100
+    position_y: 50
+
+  # PLC 2: Substation B - Breaker Controller (Modbus TCP)
+  # Controls circuit breakers, bus-tie switching, capacitor banks
+  - hostname: plc-sub-b
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: process-control
+        ip_address: "172.16.5.20"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 1100
+    position_y: 150
+
+  # PLC 3: Generation Plant - Turbine Governor Controller (EtherNet/IP)
+  # Controls turbine speed, generator output, excitation
+  - hostname: plc-gen
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: process-control
+        ip_address: "172.16.5.30"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 1100
+    position_y: 250
+
+  # PLC 4: Load Management Controller (Modbus TCP)
+  # Automatic load shedding, demand response, frequency regulation
+  - hostname: plc-load
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: process-control
+        ip_address: "172.16.5.40"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 1100
+    position_y: 350
+
+  # PLC 5: Safety Instrumented System - SIS (OPC UA)
+  # Emergency shutdown, overspeed trip, generator protection
+  - hostname: plc-safety
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: process-control
+        ip_address: "172.16.5.50"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 1100
+    position_y: 450
+
+  # RTU: Distribution Network - Remote Terminal Unit (DNP3)
+  # Monitors distribution feeders, reclosers, voltage regulators
+  - hostname: rtu-dist
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: process-control
+        ip_address: "172.16.5.60"
+        is_primary: true
+    cpu: 1
+    ram_mb: 512
+    disk_gb: 10
+    position_x: 1100
+    position_y: 550
+
+  # ============================================================
+  # SOC - SECURITY OPERATIONS CENTER
+  # ============================================================
+
+  # IDS Sensor - Suricata with ICS rulesets
+  # Monitor-mode on IT/OT DMZ, Supervisory, and Process Control networks
+  - hostname: ids-sensor
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    is_sensor_vm: true
+    sensor_config:
+      type: ids
+      engine: suricata
+      monitored_networks: ["it-ot-dmz", "supervisory", "process-control"]
+      rulesets:
+        - "et/open"
+        - "et/ics"
+        - "quickdraw/scada"
+    network_interfaces:
+      - network_name: soc
+        ip_address: "172.16.6.10"
+        is_primary: true
+      - network_name: it-ot-dmz
+        ip_address: "172.16.2.250"
+        monitor_mode: true
+      - network_name: supervisory
+        ip_address: "172.16.4.250"
+        monitor_mode: true
+      - network_name: process-control
+        ip_address: "172.16.5.250"
+        monitor_mode: true
+    cpu: 2
+    ram_mb: 4096
+    disk_gb: 40
+    position_x: 1300
+    position_y: 150
+
+  # SIEM - Wazuh (collects logs from IT and OT endpoints)
+  - hostname: siem
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    is_sensor_vm: true
+    sensor_config:
+      type: siem
+      engine: wazuh
+      log_sources:
+        - "dc01"
+        - "mail-srv"
+        - "eng-ws"
+        - "jump-host"
+        - "historian"
+        - "eng-ws-ot"
+        - "hmi-sub"
+        - "hmi-gen"
+        - "hmi-grid"
+        - "plc-sub-a"
+        - "plc-sub-b"
+        - "plc-gen"
+        - "plc-load"
+        - "plc-safety"
+        - "rtu-dist"
+    network_interfaces:
+      - network_name: soc
+        ip_address: "172.16.6.20"
+        is_primary: true
+    cpu: 4
+    ram_mb: 8192
+    disk_gb: 100
+    position_x: 1300
+    position_y: 350
+
+  # SOC Analyst Workstation (for students / blue team)
+  - hostname: soc-analyst
+    base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
+    network_interfaces:
+      - network_name: soc
+        ip_address: "172.16.6.100"
+        is_primary: true
+    cpu: 2
+    ram_mb: 4096
+    disk_gb: 40
+    position_x: 1300
+    position_y: 550
+
+router:
+  enabled: false  # Using dedicated firewall VMs for Purdue Model segmentation
+
+events:
+  # ============================================================
+  # PHASE 1: EXERCISE START - BASELINE
+  # ============================================================
+  - sequence: 1
+    delay_minutes: 0
+    title: "Exercise Start - Establish OT Baseline"
+    description: |
+      SOC team establishes baseline for both IT and OT networks.
+      Verify IDS with ICS rulesets, SIEM log collection from PLCs/HMIs,
+      and PCAP captures are operational across all Purdue zones.
+    detection_goal: "Confirm all IT and OT sensor feeds are active"
+    mitre_attack_ids: []
+
+  # ============================================================
+  # PHASE 2: IT RECONNAISSANCE (ATT&CK Enterprise)
+  # ============================================================
+  - sequence: 2
+    delay_minutes: 10
+    title: "Reconnaissance - External Port Scanning"
+    description: |
+      Attacker scans the enterprise perimeter from the internet network.
+      Probes for exposed services on the enterprise firewall and any
+      internet-facing services.
+    detection_goal: "Detect port scan activity against enterprise perimeter"
+    expected_indicators:
+      - type: "network_alert"
+        value: "ET SCAN Nmap Scripting Engine User-Agent Detected"
+      - type: "ip_address"
+        value: "172.16.0.10"
+    mitre_attack_ids: ["T1046"]
+
+  # ============================================================
+  # PHASE 3: INITIAL ACCESS - SPEARPHISHING (ATT&CK Enterprise)
+  # ============================================================
+  - sequence: 3
+    delay_minutes: 20
+    title: "Initial Access - Spearphishing the Control Systems Engineer"
+    description: |
+      Attacker sends a spearphishing email to the control systems engineer
+      (eng-ws) via the corporate mail server. The payload is a malicious
+      document that establishes a reverse shell to the attacker.
+    detection_goal: "Detect phishing delivery and malicious payload execution"
+    expected_indicators:
+      - type: "email"
+        value: "engineer@powerco.local"
+      - type: "network_alert"
+        value: "ET MALWARE Possible Reverse Shell Connection"
+      - type: "ip_address"
+        value: "172.16.1.30"
+      - type: "process_name"
+        value: "powershell.exe"
+    mitre_attack_ids: ["T1566.001", "T1059.001"]
+
+  # ============================================================
+  # PHASE 4: CREDENTIAL HARVESTING (ATT&CK Enterprise)
+  # ============================================================
+  - sequence: 4
+    delay_minutes: 35
+    title: "Credential Access - Active Directory Harvesting"
+    description: |
+      From the compromised engineer workstation, the attacker dumps
+      cached credentials and queries Active Directory for service accounts,
+      specifically looking for accounts with OT system access.
+    detection_goal: "Detect credential dumping and AD enumeration"
+    expected_indicators:
+      - type: "process_name"
+        value: "mimikatz"
+      - type: "network_alert"
+        value: "ET POLICY SMB2 NT Create AndX Request For a DLL"
+      - type: "ip_address"
+        value: "172.16.1.10"
+    mitre_attack_ids: ["T1003.001", "T1087.002"]
+
+  # ============================================================
+  # PHASE 5: LATERAL MOVEMENT TO DMZ (ATT&CK Enterprise)
+  # ============================================================
+  - sequence: 5
+    delay_minutes: 50
+    title: "Lateral Movement - IT to IT/OT DMZ Pivot"
+    description: |
+      Attacker uses harvested OT engineer credentials to access the
+      jump host in the IT/OT DMZ. This is the critical boundary crossing
+      from IT to OT networks.
+    detection_goal: "Detect unauthorized jump host access and credential reuse"
+    expected_indicators:
+      - type: "network_alert"
+        value: "ET SCAN SSH Brute Force Attempt"
+      - type: "ip_address"
+        value: "172.16.2.10"
+      - type: "syslog"
+        value: "Accepted password for ot-engineer from 172.16.1.30"
+    mitre_attack_ids: ["T1021.004", "T0886"]
+
+  # ============================================================
+  # PHASE 6: OT DISCOVERY (MITRE ATT&CK for ICS)
+  # ============================================================
+  - sequence: 6
+    delay_minutes: 65
+    title: "OT Discovery - ICS Protocol Scanning"
+    description: |
+      From the jump host, attacker scans the OT networks for industrial
+      protocols. Uses Nmap ICS scripts to identify Modbus TCP (502),
+      DNP3 (20000), EtherNet/IP (44818), and OPC UA (4840) services.
+      Enumerates PLC models, firmware versions, and register maps.
+    detection_goal: "Detect ICS protocol scanning and device enumeration"
+    expected_indicators:
+      - type: "network_alert"
+        value: "ET ICS Modbus TCP Function Code - Read Holding Registers"
+      - type: "network_alert"
+        value: "ET ICS DNP3 Request - Read"
+      - type: "network_alert"
+        value: "ET SCAN EtherNet/IP List Identity Request"
+      - type: "network_alert"
+        value: "ET ICS OPC UA Discovery Service GetEndpoints"
+      - type: "ip_address"
+        value: "172.16.2.10"
+    mitre_attack_ids: ["T0846", "T0842"]
+
+  # ============================================================
+  # PHASE 7: HMI MANIPULATION (MITRE ATT&CK for ICS)
+  # ============================================================
+  - sequence: 7
+    delay_minutes: 80
+    title: "HMI Manipulation - Spoofing Operator Displays"
+    description: |
+      Attacker accesses HMI web interfaces and modifies display values
+      to show normal readings while preparing to manipulate PLCs.
+      Targets hmi-sub and hmi-gen to blind operators to upcoming changes.
+    detection_goal: "Detect unauthorized HMI access and display manipulation"
+    expected_indicators:
+      - type: "network_alert"
+        value: "ET ICS Unauthorized HMI Web Access"
+      - type: "ip_address"
+        value: "172.16.4.10"
+      - type: "ip_address"
+        value: "172.16.4.20"
+      - type: "syslog"
+        value: "Login from unauthorized IP to HMI interface"
+    mitre_attack_ids: ["T0831"]
+
+  # ============================================================
+  # PHASE 8: PLC PROCESS MANIPULATION (MITRE ATT&CK for ICS)
+  # ============================================================
+  - sequence: 8
+    delay_minutes: 95
+    title: "Process Manipulation - PLC Setpoint Modification"
+    description: |
+      Attacker writes malicious values to PLC registers to disrupt grid operations:
+      - Modbus TCP: Writes to holding registers on plc-sub-b to open breakers
+      - DNP3: Sends direct operate commands to plc-sub-a to disable protection
+      - EtherNet/IP: Modifies turbine governor setpoint on plc-gen
+      This causes voltage instability and potential equipment damage.
+    detection_goal: "Detect unauthorized PLC register writes and setpoint changes"
+    expected_indicators:
+      - type: "network_alert"
+        value: "ET ICS Modbus TCP Function Code - Write Multiple Registers"
+      - type: "network_alert"
+        value: "ET ICS DNP3 Direct Operate Command"
+      - type: "network_alert"
+        value: "ET ICS EtherNet/IP CIP Write Request"
+      - type: "ip_address"
+        value: "172.16.5.10"
+      - type: "ip_address"
+        value: "172.16.5.20"
+      - type: "ip_address"
+        value: "172.16.5.30"
+    mitre_attack_ids: ["T0836", "T0855"]
+
+  # ============================================================
+  # PHASE 9: SAFETY SYSTEM BYPASS (MITRE ATT&CK for ICS)
+  # ============================================================
+  - sequence: 9
+    delay_minutes: 110
+    title: "Safety Bypass - SIS Manipulation Attempt"
+    description: |
+      Attacker attempts to disable the Safety Instrumented System (plc-safety)
+      via OPC UA to prevent emergency shutdown during grid destabilization.
+      Writes to OPC UA nodes controlling the overspeed trip and generator
+      protection functions.
+    detection_goal: "Detect SIS modification attempt and OPC UA unauthorized writes"
+    expected_indicators:
+      - type: "network_alert"
+        value: "ET ICS OPC UA Write Request to Safety Controller"
+      - type: "ip_address"
+        value: "172.16.5.50"
+      - type: "syslog"
+        value: "OPC UA unauthorized write attempt to safety node"
+    mitre_attack_ids: ["T0880", "T0857"]
+
+  # ============================================================
+  # PHASE 10: IMPACT - GRID DISRUPTION (MITRE ATT&CK for ICS)
+  # ============================================================
+  - sequence: 10
+    delay_minutes: 120
+    title: "Impact - Grid Disruption and Blackout"
+    description: |
+      Combined effect of breaker manipulation, protection relay disabling,
+      and turbine governor modification causes cascading grid failure.
+      Load management PLC unable to shed load. If SIS was successfully
+      bypassed, generator sustains damage from overspeed condition.
+    detection_goal: "Detect cascading process anomalies and correlate with prior attack phases"
+    expected_indicators:
+      - type: "process_alarm"
+        value: "GRID_FREQUENCY_DEVIATION_CRITICAL"
+      - type: "process_alarm"
+        value: "BREAKER_STATE_MISMATCH"
+      - type: "process_alarm"
+        value: "TURBINE_OVERSPEED_WARNING"
+      - type: "network_alert"
+        value: "Multiple ICS protocol anomalies detected"
+    mitre_attack_ids: ["T0826", "T0813"]
+
+  # ============================================================
+  # PHASE 11: INCIDENT RESPONSE
+  # ============================================================
+  - sequence: 11
+    delay_minutes: 130
+    title: "Incident Response - OT Containment and Recovery"
+    description: |
+      Blue team executes ICS-specific incident response:
+      1. Isolate compromised OT zones at the OT firewall
+      2. Switch PLCs to local/manual control mode
+      3. Verify SIS integrity and reset if tampered
+      4. Block attacker lateral movement at IT/OT DMZ
+      5. Preserve OT forensic evidence (PCAPs, PLC memory dumps, historian logs)
+      6. Coordinate with plant operators for safe process restart
+    detection_goal: "Execute OT-aware containment without causing additional process disruption"
+    mitre_attack_ids: []

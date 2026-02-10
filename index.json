@@ -76,6 +76,33 @@
       "checksum": "sha256:2ed40eb1c841b4d6"
     },
     {
+      "id": "ics-power-grid-defense-lab",
+      "type": "blueprint",
+      "name": "ICS Power Grid Defense Lab",
+      "description": "ICS/SCADA defensive training environment for network security operations teams.\nFull Purdue Model (IEC 62443) electric power grid with 7 network zones (L0-L5 + SOC).\n5 PLCs + 1 RTU using Modbus TCP, DNP3, EtherNet/IP, and OPC UA protocols.\n3 HMIs, IT infrastructure, and SOC monitoring with Suricata ICS rulesets.\nFull IT-to-OT kill chain attack with MITRE ATT&CK for ICS mapping.",
+      "tags": [
+        "ics",
+        "scada",
+        "ot-security",
+        "power-grid",
+        "purdue-model",
+        "blue-team",
+        "defensive-cyber"
+      ],
+      "version": "1.0",
+      "path": "blueprints/ics-power-grid-defense-lab",
+      "requires_images": [
+        "kali-attack",
+        "redteam-firewall",
+        "redteam-lab-wordpress",
+        "redteam-lab-workstation",
+        "samba-dc"
+      ],
+      "includes_msel": true,
+      "includes_content": true,
+      "checksum": "sha256:b1d16238f8822a74"
+    },
+    {
       "id": "apt-intrusion",
       "type": "scenario",
       "name": "APT Intrusion",
