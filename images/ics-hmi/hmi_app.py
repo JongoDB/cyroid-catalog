@@ -48,15 +48,22 @@ HOSTNAME_CONFIG = {
 }
 
 def _auto_config():
+    """Hostname auto-config takes priority over Dockerfile ENV defaults."""
     import socket
     hostname = socket.gethostname()
     auto = HOSTNAME_CONFIG.get(hostname, {})
-    targets_env = os.environ.get("PLC_TARGETS", "")
-    targets = json.loads(targets_env) if targets_env else auto.get("targets", [])
-    name = os.environ.get("HMI_NAME", auto.get("name", "HMI-001"))
-    role = os.environ.get("HMI_ROLE", auto.get("role", "substation"))
-    if auto and not targets_env:
+    if auto:
+        # Hostname match — use auto-config (ignore Dockerfile ENV defaults)
+        targets = auto["targets"]
+        name = auto["name"]
+        role = auto["role"]
         log.info(f"Auto-configured from hostname '{hostname}': role={role}, targets={len(targets)} PLCs")
+    else:
+        # No hostname match — fall back to env vars
+        targets_env = os.environ.get("PLC_TARGETS", "[]")
+        targets = json.loads(targets_env) if targets_env else []
+        name = os.environ.get("HMI_NAME", "HMI-001")
+        role = os.environ.get("HMI_ROLE", "substation")
     return name, role, targets
 
 HMI_NAME, HMI_ROLE, PLC_TARGETS = _auto_config()

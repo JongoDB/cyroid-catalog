@@ -26,15 +26,16 @@ ALL_PLCS = [
 ]
 
 def _auto_config():
+    """Hostname auto-config takes priority over Dockerfile ENV defaults."""
     import socket
     hostname = socket.gethostname()
-    targets_env = os.environ.get("PLC_TARGETS", "")
-    if targets_env:
-        return json.loads(targets_env)
     if hostname in ("historian", "hist-mirror"):
         log.info(f"Auto-configured from hostname '{hostname}': polling all 6 PLCs")
         return ALL_PLCS
-    return []
+    # No hostname match — fall back to env var
+    targets_env = os.environ.get("PLC_TARGETS", "[]")
+    targets = json.loads(targets_env) if targets_env else []
+    return targets
 
 PLC_TARGETS = _auto_config()
 POLL_INTERVAL = int(os.environ.get("POLL_INTERVAL", "5"))

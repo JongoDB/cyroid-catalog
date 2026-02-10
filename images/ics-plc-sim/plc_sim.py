@@ -30,16 +30,22 @@ HOSTNAME_CONFIG = {
 }
 
 def _auto_config():
-    """Resolve PLC config from env vars, falling back to hostname detection."""
+    """Resolve PLC config: hostname auto-config takes priority over Dockerfile defaults."""
     import socket
     hostname = socket.gethostname()
     auto = HOSTNAME_CONFIG.get(hostname, {})
-    protocol = os.environ.get("PLC_PROTOCOL", auto.get("protocol", "modbus")).lower()
-    name = os.environ.get("PLC_NAME", auto.get("name", "PLC-001"))
-    role = os.environ.get("PLC_ROLE", auto.get("role", "substation_breaker"))
-    port = os.environ.get("PLC_PORT", "")
     if auto:
+        # Hostname match found — use it (env vars only override if explicitly set at runtime)
+        protocol = auto["protocol"]
+        name = auto["name"]
+        role = auto["role"]
         log.info(f"Auto-configured from hostname '{hostname}': protocol={protocol}, role={role}")
+    else:
+        # No hostname match — use env vars with fallback defaults
+        protocol = os.environ.get("PLC_PROTOCOL", "modbus").lower()
+        name = os.environ.get("PLC_NAME", "PLC-001")
+        role = os.environ.get("PLC_ROLE", "substation_breaker")
+    port = os.environ.get("PLC_PORT", "")
     return protocol, name, role, port
 
 PROTOCOL, PLC_NAME, PLC_ROLE, PLC_PORT = _auto_config()
