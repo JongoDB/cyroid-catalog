@@ -18,7 +18,9 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive \
     HOME=/home/kasm-default-profile
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN wget -q -O /tmp/kali-key.asc https://archive.kali.org/archive-keyring.gpg \
+    && cp /tmp/kali-key.asc /usr/share/keyrings/kali-archive-keyring.gpg \
+    && apt-get update && apt-get install -y --no-install-recommends \
     wireshark-common tshark tcpdump nmap \
     python3-pip python3-venv \
     curl wget vim tmux jq \
