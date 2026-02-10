@@ -14,9 +14,52 @@ log = logging.getLogger("hmi")
 
 app = Flask(__name__, template_folder="/app/templates")
 
-HMI_NAME = os.environ.get("HMI_NAME", "HMI-001")
-HMI_ROLE = os.environ.get("HMI_ROLE", "substation")
-PLC_TARGETS = json.loads(os.environ.get("PLC_TARGETS", "[]"))
+# Hostname-based auto-configuration for CYROID ICS Power Grid Defense Lab.
+# If PLC_TARGETS env var is not set, detect config from hostname.
+HOSTNAME_CONFIG = {
+    "hmi-sub": {
+        "name": "Substation HMI",
+        "role": "substation",
+        "targets": [
+            {"name": "plc-sub-a", "host": "172.16.5.10", "port": 502, "protocol": "modbus"},
+            {"name": "plc-sub-b", "host": "172.16.5.20", "port": 502, "protocol": "modbus"},
+        ],
+    },
+    "hmi-gen": {
+        "name": "Generation HMI",
+        "role": "generation",
+        "targets": [
+            {"name": "plc-gen",  "host": "172.16.5.30", "port": 44818, "protocol": "enip"},
+            {"name": "plc-load", "host": "172.16.5.40", "port": 502,   "protocol": "modbus"},
+        ],
+    },
+    "hmi-grid": {
+        "name": "Grid Overview HMI",
+        "role": "grid",
+        "targets": [
+            {"name": "plc-sub-a",  "host": "172.16.5.10", "port": 502,   "protocol": "modbus"},
+            {"name": "plc-sub-b",  "host": "172.16.5.20", "port": 502,   "protocol": "modbus"},
+            {"name": "plc-gen",    "host": "172.16.5.30", "port": 44818, "protocol": "enip"},
+            {"name": "plc-load",   "host": "172.16.5.40", "port": 502,   "protocol": "modbus"},
+            {"name": "plc-safety", "host": "172.16.5.50", "port": 4840,  "protocol": "opcua"},
+            {"name": "rtu-dist",   "host": "172.16.5.60", "port": 502,   "protocol": "modbus"},
+        ],
+    },
+}
+
+def _auto_config():
+    import socket
+    hostname = socket.gethostname()
+    auto = HOSTNAME_CONFIG.get(hostname, {})
+    targets_env = os.environ.get("PLC_TARGETS", "")
+    targets = json.loads(targets_env) if targets_env else auto.get("targets", [])
+    name = os.environ.get("HMI_NAME", auto.get("name", "HMI-001"))
+    role = os.environ.get("HMI_ROLE", auto.get("role", "substation"))
+    if auto and not targets_env:
+        log.info(f"Auto-configured from hostname '{hostname}': role={role}, targets={len(targets)} PLCs")
+    return name, role, targets
+
+HMI_NAME, HMI_ROLE, PLC_TARGETS = _auto_config()
 
 # Shared state for latest PLC readings
 plc_data = {}

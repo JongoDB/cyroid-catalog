@@ -18,10 +18,31 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 log = logging.getLogger("plc-sim")
 
-PROTOCOL = os.environ.get("PLC_PROTOCOL", "modbus").lower()
-PLC_NAME = os.environ.get("PLC_NAME", "PLC-001")
-PLC_ROLE = os.environ.get("PLC_ROLE", "substation_breaker")
-PLC_PORT = os.environ.get("PLC_PORT", "")
+# Hostname-based auto-configuration for CYROID ICS Power Grid Defense Lab.
+# If PLC_PROTOCOL env var is not explicitly set, detect config from hostname.
+HOSTNAME_CONFIG = {
+    "plc-sub-a":  {"protocol": "modbus", "role": "substation_protection", "name": "Substation-A Protection Relay"},
+    "plc-sub-b":  {"protocol": "modbus", "role": "substation_breaker",    "name": "Substation-B Breaker Control"},
+    "plc-gen":    {"protocol": "enip",   "role": "turbine_governor",      "name": "Turbine Governor"},
+    "plc-load":   {"protocol": "modbus", "role": "load_management",       "name": "Load Management"},
+    "plc-safety": {"protocol": "opcua",  "role": "safety_sis",            "name": "Safety Instrumented System"},
+    "rtu-dist":   {"protocol": "modbus", "role": "distribution_rtu",      "name": "Distribution RTU"},
+}
+
+def _auto_config():
+    """Resolve PLC config from env vars, falling back to hostname detection."""
+    import socket
+    hostname = socket.gethostname()
+    auto = HOSTNAME_CONFIG.get(hostname, {})
+    protocol = os.environ.get("PLC_PROTOCOL", auto.get("protocol", "modbus")).lower()
+    name = os.environ.get("PLC_NAME", auto.get("name", "PLC-001"))
+    role = os.environ.get("PLC_ROLE", auto.get("role", "substation_breaker"))
+    port = os.environ.get("PLC_PORT", "")
+    if auto:
+        log.info(f"Auto-configured from hostname '{hostname}': protocol={protocol}, role={role}")
+    return protocol, name, role, port
+
+PROTOCOL, PLC_NAME, PLC_ROLE, PLC_PORT = _auto_config()
 
 REGISTER_DIR = Path("/app/registers")
 

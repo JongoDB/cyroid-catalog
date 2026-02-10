@@ -15,7 +15,28 @@ log = logging.getLogger("historian")
 
 app = Flask(__name__)
 
-PLC_TARGETS = json.loads(os.environ.get("PLC_TARGETS", "[]"))
+# Hostname-based auto-configuration for CYROID ICS Power Grid Defense Lab.
+ALL_PLCS = [
+    {"name": "plc-sub-a",  "host": "172.16.5.10", "port": 502,   "protocol": "modbus"},
+    {"name": "plc-sub-b",  "host": "172.16.5.20", "port": 502,   "protocol": "modbus"},
+    {"name": "plc-gen",    "host": "172.16.5.30", "port": 44818, "protocol": "enip"},
+    {"name": "plc-load",   "host": "172.16.5.40", "port": 502,   "protocol": "modbus"},
+    {"name": "plc-safety", "host": "172.16.5.50", "port": 4840,  "protocol": "opcua"},
+    {"name": "rtu-dist",   "host": "172.16.5.60", "port": 502,   "protocol": "modbus"},
+]
+
+def _auto_config():
+    import socket
+    hostname = socket.gethostname()
+    targets_env = os.environ.get("PLC_TARGETS", "")
+    if targets_env:
+        return json.loads(targets_env)
+    if hostname in ("historian", "hist-mirror"):
+        log.info(f"Auto-configured from hostname '{hostname}': polling all 6 PLCs")
+        return ALL_PLCS
+    return []
+
+PLC_TARGETS = _auto_config()
 POLL_INTERVAL = int(os.environ.get("POLL_INTERVAL", "5"))
 DB_PATH = os.environ.get("DB_PATH", "/data/historian.db")
 
@@ -47,8 +68,57 @@ def poll_modbus(target):
             if not result.isError():
                 return {str(i): v for i, v in enumerate(result.registers)}
     except Exception as e:
-        log.debug(f"Poll error {target['host']}: {e}")
+        log.debug(f"Modbus poll error {target['host']}: {e}")
     return None
+
+
+def poll_opcua(target):
+    try:
+        import asyncio
+        from asyncua import Client
+
+        async def _read():
+            url = f"opc.tcp://{target['host']}:{target.get('port', 4840)}/cyroid/plc"
+            async with Client(url=url) as client:
+                root = client.nodes.objects
+                values = {}
+                for child in await root.get_children():
+                    try:
+                        for var in await child.get_children():
+                            var_name = await var.read_browse_name()
+                            val = await var.read_value()
+                            values[var_name.Name] = round(float(val), 2)
+                    except Exception:
+                        pass
+                return values
+
+        return asyncio.run(_read())
+    except Exception as e:
+        log.debug(f"OPC UA poll error {target['host']}: {e}")
+    return None
+
+
+def poll_enip(target):
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["python3", "-m", "cpppo.server.enip.client",
+             "--address", f"{target['host']}:{target.get('port', 44818)}",
+             "--print", "scada[0-9]"],
+            capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return {"raw": result.stdout.strip()}
+    except Exception as e:
+        log.debug(f"EtherNet/IP poll error {target['host']}: {e}")
+    return None
+
+
+POLLERS = {
+    "modbus": poll_modbus,
+    "opcua": poll_opcua,
+    "enip": poll_enip,
+}
 
 
 def store_data(plc_name, values):
@@ -69,7 +139,9 @@ def store_data(plc_name, values):
 def polling_loop():
     while True:
         for target in PLC_TARGETS:
-            data = poll_modbus(target)
+            proto = target.get("protocol", "modbus")
+            poller = POLLERS.get(proto, poll_modbus)
+            data = poller(target)
             if data:
                 store_data(target.get("name", target["host"]), data)
         time.sleep(POLL_INTERVAL)
