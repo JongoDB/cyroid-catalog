@@ -490,12 +490,23 @@ vms:
     position_y: 350
 
   # SOC Analyst Workstation (for students / blue team)
+  # Has read-only visibility into OT networks for monitoring/verification
   - hostname: soc-analyst
     base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
     network_interfaces:
       - network_name: soc
         ip_address: "172.16.6.100"
         is_primary: true
+      - network_name: enterprise
+        ip_address: "172.16.1.200"
+      - network_name: it-ot-dmz
+        ip_address: "172.16.2.200"
+      - network_name: operations
+        ip_address: "172.16.3.200"
+      - network_name: supervisory
+        ip_address: "172.16.4.200"
+      - network_name: process-control
+        ip_address: "172.16.5.200"
     cpu: 2
     ram_mb: 4096
     disk_gb: 40
