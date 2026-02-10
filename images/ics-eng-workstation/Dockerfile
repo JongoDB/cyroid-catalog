@@ -18,15 +18,10 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive \
     HOME=/home/kasm-default-profile
 
-# ICS tools via apt
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Network analysis
     wireshark-common tshark tcpdump nmap \
-    # Development
     python3-pip python3-venv \
-    # Utilities
     curl wget vim tmux jq \
-    # Network tools
     netcat-openbsd socat iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
