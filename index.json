@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-10T23:21:14.230732+00:00"
+    "generated_at": "2026-02-10T23:37:04.657525+00:00"
   },
   "items": [
     {
@@ -28,7 +28,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:a8b338805b825bf1"
+      "checksum": "sha256:fc91369aaf2491b7"
     },
     {
       "id": "red-team-training-lab",
@@ -171,7 +171,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-historian:latest",
-      "checksum": "sha256:d85b54ecdfe1b3eb"
+      "checksum": "sha256:5db4b00e54341d43"
     },
     {
       "id": "ics-hmi",
@@ -188,7 +188,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-hmi:latest",
-      "checksum": "sha256:b188647593cb73e0"
+      "checksum": "sha256:84b7e9edb16d5649"
     },
     {
       "id": "ics-ot-firewall",
@@ -219,7 +219,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-plc-sim:latest",
-      "checksum": "sha256:c1be3fc33fccf00e"
+      "checksum": "sha256:3e152bc0fc8d3d20"
     },
     {
       "id": "kali-attack",
