@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-10T20:15:36.632131+00:00"
+    "generated_at": "2026-02-10T20:32:20.783667+00:00"
   },
   "items": [
     {
@@ -17,18 +17,18 @@
       "requires_images": [
         "kali-attack",
         "redteam-firewall",
-        "redteam-lab-wordpress",
-        "redteam-lab-workstation",
         "samba-dc",
-        "ics-plc-sim",
-        "ics-hmi",
+        "redteam-lab-workstation",
+        "redteam-lab-wordpress",
         "ics-historian",
+        "ics-ot-firewall",
         "ics-eng-workstation",
-        "ics-ot-firewall"
+        "ics-hmi",
+        "ics-plc-sim"
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:26fd438541feeaed"
+      "checksum": "sha256:27824082e07093b7"
     },
     {
       "id": "red-team-training-lab",
@@ -138,6 +138,88 @@
       "version": "1.0",
       "path": "scenarios/ransomware-attack.yaml",
       "checksum": "sha256:fde2b73c3f3a894d"
+    },
+    {
+      "id": "ics-eng-workstation",
+      "type": "image",
+      "name": "ICS OT Engineering Workstation",
+      "description": "OT engineering workstation with KasmVNC desktop and ICS-specific tools.\nIncludes Modbus/OPC UA/EtherNet-IP clients, Wireshark with ICS dissectors,\nNmap with ICS scripts, and Python ICS libraries for PLC interaction.",
+      "tags": [
+        "ics"
+      ],
+      "version": "1.0",
+      "path": "images/ics-eng-workstation",
+      "arch": [
+        "x86_64",
+        "arm64"
+      ],
+      "docker_tag": "cyroid/ics-eng-workstation:latest",
+      "checksum": "sha256:4f2340b69f12d66e"
+    },
+    {
+      "id": "ics-historian",
+      "type": "image",
+      "name": "ICS Process Historian",
+      "description": "Process data historian that polls all PLCs and stores time-series data.\nProvides a web interface for viewing historical trends and a REST API\nfor querying process data. Uses SQLite for lightweight storage.",
+      "tags": [
+        "ics"
+      ],
+      "version": "1.0",
+      "path": "images/ics-historian",
+      "arch": [
+        "x86_64",
+        "arm64"
+      ],
+      "docker_tag": "cyroid/ics-historian:latest",
+      "checksum": "sha256:243f08f20c3e5129"
+    },
+    {
+      "id": "ics-hmi",
+      "type": "image",
+      "name": "ICS SCADA HMI",
+      "description": "Web-based SCADA HMI dashboard for power grid monitoring.\nPolls PLCs via Modbus TCP, OPC UA, or EtherNet/IP and renders\nreal-time process values with gauges, indicators, and trend charts.\nConfigurable for substation, generation, or grid overview roles.",
+      "tags": [
+        "ics"
+      ],
+      "version": "1.0",
+      "path": "images/ics-hmi",
+      "arch": [
+        "x86_64",
+        "arm64"
+      ],
+      "docker_tag": "cyroid/ics-hmi:latest",
+      "checksum": "sha256:aa841fefd9bc7c90"
+    },
+    {
+      "id": "ics-ot-firewall",
+      "type": "image",
+      "name": "ICS OT Zone Firewall",
+      "description": "OT perimeter firewall enforcing Purdue Model zone segmentation.\nAllows ICS protocols (Modbus TCP 502, OPC UA 4840, EtherNet/IP 44818)\nonly between authorized pairs (HMI->PLC, historian->PLC).\nBlocks all unauthorized cross-zone traffic.",
+      "tags": [
+        ""
+      ],
+      "version": "1.0",
+      "path": "images/ics-ot-firewall",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/ics-ot-firewall:latest",
+      "checksum": "sha256:8bc6254a89214ddf"
+    },
+    {
+      "id": "ics-plc-sim",
+      "type": "image",
+      "name": "ICS PLC Simulator",
+      "description": "Universal ICS PLC simulator for cyber range training.\nSupports Modbus TCP (port 502), OPC UA (port 4840), and EtherNet/IP (port 44818).\nProtocol and register map configured via environment variables.\nSimulates realistic power grid process values with drift and noise.",
+      "tags": [
+        "ics"
+      ],
+      "version": "1.0",
+      "path": "images/ics-plc-sim",
+      "arch": [
+        "x86_64",
+        "arm64"
+      ],
+      "docker_tag": "cyroid/ics-plc-sim:latest",
+      "checksum": "sha256:b2c62f5483965049"
     },
     {
       "id": "kali-attack",
@@ -557,81 +639,6 @@
       "path": "base-images/red-team/redirector.yaml",
       "arch": "both",
       "checksum": "sha256:34bfca248d0a2573"
-    },
-    {
-      "id": "ics-plc-sim",
-      "type": "image",
-      "name": "ICS PLC Simulator",
-      "description": "Universal PLC/RTU simulator supporting Modbus TCP (port 502), OPC UA (port 4840), and EtherNet/IP (port 44818). Configurable via environment variables for different device roles (substation protection, breaker control, turbine governor, load management, safety SIS, distribution RTU). Simulates realistic process values with mean-reverting random walk.",
-      "tags": [
-        "ics",
-        "plc",
-        "modbus",
-        "opcua",
-        "enip",
-        "scada"
-      ],
-      "version": "1.0",
-      "path": "images/ics-plc-sim",
-      "checksum": "sha256:placeholder"
-    },
-    {
-      "id": "ics-hmi",
-      "type": "image",
-      "name": "ICS SCADA HMI Dashboard",
-      "description": "Web-based SCADA Human-Machine Interface with real-time process visualization. Polls PLCs via Modbus TCP, OPC UA, and EtherNet/IP protocols. Dark SCADA-style dashboard with auto-refreshing gauges and status indicators. Configurable for different HMI roles (substation, generation, grid overview).",
-      "tags": [
-        "ics",
-        "hmi",
-        "scada",
-        "dashboard"
-      ],
-      "version": "1.0",
-      "path": "images/ics-hmi",
-      "checksum": "sha256:placeholder"
-    },
-    {
-      "id": "ics-historian",
-      "type": "image",
-      "name": "ICS Process Historian",
-      "description": "Process data historian with SQLite time-series storage. Polls all configured PLCs and stores register values over time. Provides REST API for data queries and web-based trend viewer for historical analysis.",
-      "tags": [
-        "ics",
-        "historian",
-        "timeseries"
-      ],
-      "version": "1.0",
-      "path": "images/ics-historian",
-      "checksum": "sha256:placeholder"
-    },
-    {
-      "id": "ics-eng-workstation",
-      "type": "image",
-      "name": "ICS OT Engineering Workstation",
-      "description": "OT engineering workstation based on Kali Linux with KasmVNC desktop access. Pre-installed with ICS tools: pymodbus CLI, OPC UA client tools (uaclient, uadiscover), EtherNet/IP client (cpppo), Wireshark with ICS dissectors, and Nmap with ICS NSE scripts. Includes ICS tools cheatsheet on desktop.",
-      "tags": [
-        "ics",
-        "workstation",
-        "ot-tools"
-      ],
-      "version": "1.0",
-      "path": "images/ics-eng-workstation",
-      "checksum": "sha256:placeholder"
-    },
-    {
-      "id": "ics-ot-firewall",
-      "type": "image",
-      "name": "ICS OT Zone Firewall",
-      "description": "ICS-aware firewall enforcing Purdue Model (IEC 62443) network segmentation. Whitelist-based iptables rules allow only authorized ICS protocol traffic (Modbus TCP/502, OPC UA/4840, EtherNet/IP/44818) between designated zone pairs. Logs all dropped packets for IDS training.",
-      "tags": [
-        "ics",
-        "firewall",
-        "iec-62443",
-        "purdue-model"
-      ],
-      "version": "1.0",
-      "path": "images/ics-ot-firewall",
-      "checksum": "sha256:placeholder"
     }
   ]
 }
