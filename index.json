@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-10T23:37:04.657525+00:00"
+    "generated_at": "2026-02-10T23:40:35.097443+00:00"
   },
   "items": [
     {
@@ -28,7 +28,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:fc91369aaf2491b7"
+      "checksum": "sha256:4cda84fd74cf3339"
     },
     {
       "id": "red-team-training-lab",
