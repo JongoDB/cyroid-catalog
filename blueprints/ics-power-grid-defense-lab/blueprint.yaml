@@ -1,6 +1,6 @@
 # CYROID ICS/SCADA Power Grid Defense Lab Blueprint
 # Full Purdue Model (IEC 62443) - Electric Power Grid
-# Protocols: Modbus TCP, EtherNet/IP, OPC UA
+# Protocols: Modbus TCP, DNP3, EtherNet/IP, OPC UA
 # Attack Chain: Full IT-to-OT Kill Chain (MITRE ATT&CK for ICS)
 seed_id: ics-power-grid-defense-lab
 name: ICS Power Grid Defense Lab
@@ -23,13 +23,15 @@ description: |
 
   Industrial Protocols:
   - Modbus TCP (PLCs: Substation B breaker, Load management)
-  - Modbus TCP (PLCs: Substation A protection relay, Distribution RTU)
+  - DNP3 (PLCs: Substation A protection relay, Distribution RTU)
   - EtherNet/IP / CIP (PLC: Turbine governor)
   - OPC UA (PLC: Safety instrumented system, OPC gateway)
 
   Defensive Capabilities:
-  - Suricata IDS with ICS rulesets (ET ICS, Quickdraw SCADA)
-  - Wazuh SIEM with OT-specific log correlation
+  - IDS sensor with monitor-mode interfaces on IT/OT DMZ, Supervisory, and Process Control networks
+  - Network monitoring tools (tcpdump, tshark, nmap) on SOC workstations
+  - Process data historian with REST API for PLC data verification
+  - HMI web dashboards for real-time process monitoring
   - Traffic mirroring on IT/OT DMZ, Supervisory, and Process Control networks
   - Full PCAP capture on all mirrored zones
   - Detection scoring with MITRE ATT&CK for ICS mapping
@@ -239,14 +241,14 @@ vms:
     base_image_tag: "127.0.0.1:5000/cyroid/ics-ot-firewall:latest"
     network_interfaces:
       - network_name: it-ot-dmz
-        ip_address: "172.16.2.253"
+        ip_address: "172.16.2.254"
         is_primary: true
       - network_name: operations
-        ip_address: "172.16.3.253"
+        ip_address: "172.16.3.1"
       - network_name: supervisory
-        ip_address: "172.16.4.253"
+        ip_address: "172.16.4.1"
       - network_name: process-control
-        ip_address: "172.16.5.253"
+        ip_address: "172.16.5.1"
     cpu: 1
     ram_mb: 512
     disk_gb: 10
@@ -324,8 +326,6 @@ vms:
       - network_name: supervisory
         ip_address: "172.16.4.30"
         is_primary: true
-      - network_name: process-control
-        ip_address: "172.16.5.102"
     cpu: 2
     ram_mb: 2048
     disk_gb: 20
@@ -336,7 +336,7 @@ vms:
   # L1/L0 - PROCESS CONTROL / FIELD DEVICES
   # ============================================================
 
-  # PLC 1: Substation A - Protection Relay Controller (Modbus TCP)
+  # PLC 1: Substation A - Protection Relay Controller (DNP3)
   # Monitors overcurrent, distance protection, auto-reclosing
   - hostname: plc-sub-a
     base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
@@ -406,7 +406,7 @@ vms:
     position_x: 1100
     position_y: 450
 
-  # RTU: Distribution Network - Remote Terminal Unit (Modbus TCP)
+  # RTU: Distribution Network - Remote Terminal Unit (DNP3)
   # Monitors distribution feeders, reclosers, voltage regulators
   - hostname: rtu-dist
     base_image_tag: "127.0.0.1:5000/cyroid/ics-plc-sim:latest"
@@ -490,23 +490,12 @@ vms:
     position_y: 350
 
   # SOC Analyst Workstation (for students / blue team)
-  # Has read-only visibility into OT networks for monitoring/verification
   - hostname: soc-analyst
     base_image_tag: "127.0.0.1:5000/cyroid/kali-attack:latest"
     network_interfaces:
       - network_name: soc
         ip_address: "172.16.6.100"
         is_primary: true
-      - network_name: enterprise
-        ip_address: "172.16.1.200"
-      - network_name: it-ot-dmz
-        ip_address: "172.16.2.200"
-      - network_name: operations
-        ip_address: "172.16.3.200"
-      - network_name: supervisory
-        ip_address: "172.16.4.200"
-      - network_name: process-control
-        ip_address: "172.16.5.200"
     cpu: 2
     ram_mb: 4096
     disk_gb: 40
@@ -619,12 +608,14 @@ events:
     description: |
       From the jump host, attacker scans the OT networks for industrial
       protocols. Uses Nmap ICS scripts to identify Modbus TCP (502),
-      EtherNet/IP (44818), and OPC UA (4840) services.
+      DNP3 (20000), EtherNet/IP (44818), and OPC UA (4840) services.
       Enumerates PLC models, firmware versions, and register maps.
     detection_goal: "Detect ICS protocol scanning and device enumeration"
     expected_indicators:
       - type: "network_alert"
         value: "ET ICS Modbus TCP Function Code - Read Holding Registers"
+      - type: "network_alert"
+        value: "ET ICS DNP3 Request - Read"
       - type: "network_alert"
         value: "ET SCAN EtherNet/IP List Identity Request"
       - type: "network_alert"
@@ -664,7 +655,7 @@ events:
     description: |
       Attacker writes malicious values to PLC registers to disrupt grid operations:
       - Modbus TCP: Writes to holding registers on plc-sub-b to open breakers
-      - Modbus TCP: Writes to plc-sub-a to disable protection relay
+      - DNP3: Sends direct operate commands to plc-sub-a to disable protection
       - EtherNet/IP: Modifies turbine governor setpoint on plc-gen
       This causes voltage instability and potential equipment damage.
     detection_goal: "Detect unauthorized PLC register writes and setpoint changes"
@@ -672,7 +663,7 @@ events:
       - type: "network_alert"
         value: "ET ICS Modbus TCP Function Code - Write Multiple Registers"
       - type: "network_alert"
-        value: "ET ICS Modbus TCP Function Code - Write Single Register"
+        value: "ET ICS DNP3 Direct Operate Command"
       - type: "network_alert"
         value: "ET ICS EtherNet/IP CIP Write Request"
       - type: "ip_address"
