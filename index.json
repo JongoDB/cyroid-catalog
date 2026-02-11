@@ -3,14 +3,14 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-10T23:40:35.097443+00:00"
+    "generated_at": "2026-02-11T20:12:18.917031+00:00"
   },
   "items": [
     {
       "id": "ics-power-grid-defense-lab",
       "type": "blueprint",
       "name": "ICS Power Grid Defense Lab",
-      "description": "ICS/SCADA defensive training environment for network security operations teams.\nSimulates an electric power grid with full Purdue Model segmentation (L0-L5).\n\nTrains defenders to detect and respond to a full IT-to-OT kill chain attack\ntargeting industrial control systems managing power generation, transmission,\nand distribution infrastructure.\n\nPurdue Model Network Zones:\n- L5 Internet: External attacker simulation\n- L4 Enterprise: Corporate IT (DC, email, engineer workstation)\n- L3.5 IT/OT DMZ: Jump host, historian mirror, data diode\n- L3 Operations: Site historian, OT engineering workstation\n- L2 Supervisory: HMI consoles, SCADA displays\n- L1/L0 Process Control: PLCs, RTUs, field devices\n- SOC: IDS/SIEM sensors with monitor-mode on OT zones\n\nIndustrial Protocols:\n- Modbus TCP (PLCs: Substation B breaker, Load management)\n- Modbus TCP (PLCs: Substation A protection relay, Distribution RTU)\n- EtherNet/IP / CIP (PLC: Turbine governor)\n- OPC UA (PLC: Safety instrumented system, OPC gateway)\n\nDefensive Capabilities:\n- Suricata IDS with ICS rulesets (ET ICS, Quickdraw SCADA)\n- Wazuh SIEM with OT-specific log correlation\n- Traffic mirroring on IT/OT DMZ, Supervisory, and Process Control networks\n- Full PCAP capture on all mirrored zones\n- Detection scoring with MITRE ATT&CK for ICS mapping\n- IOC submission and grading\n- Threat hunting and forensic analysis workflows\n\nRed Team (Automated Injects - Full Kill Chain):\n- IT reconnaissance and spearphishing\n- Active Directory credential harvesting\n- IT-to-OT pivot via jump host\n- OT protocol scanning and enumeration\n- HMI screen manipulation\n- PLC register/setpoint modification\n- Safety system bypass attempt",
+      "description": "ICS/SCADA defensive training environment for network security operations teams.\nSimulates an electric power grid with full Purdue Model segmentation (L0-L5).\n\nTrains defenders to detect and respond to a full IT-to-OT kill chain attack\ntargeting industrial control systems managing power generation, transmission,\nand distribution infrastructure.\n\nPurdue Model Network Zones:\n- L5 Internet: External attacker simulation\n- L4 Enterprise: Corporate IT (DC, email, engineer workstation)\n- L3.5 IT/OT DMZ: Jump host, historian mirror, data diode\n- L3 Operations: Site historian, OT engineering workstation\n- L2 Supervisory: HMI consoles, SCADA displays\n- L1/L0 Process Control: PLCs, RTUs, field devices\n- SOC: IDS/SIEM sensors with monitor-mode on OT zones\n\nIndustrial Protocols:\n- Modbus TCP (PLCs: Substation B breaker, Load management)\n- DNP3 (PLCs: Substation A protection relay, Distribution RTU)\n- EtherNet/IP / CIP (PLC: Turbine governor)\n- OPC UA (PLC: Safety instrumented system, OPC gateway)\n\nDefensive Capabilities:\n- IDS sensor with monitor-mode interfaces on IT/OT DMZ, Supervisory, and Process Control networks\n- Network monitoring tools (tcpdump, tshark, nmap) on SOC workstations\n- Process data historian with REST API for PLC data verification\n- HMI web dashboards for real-time process monitoring\n- Traffic mirroring on IT/OT DMZ, Supervisory, and Process Control networks\n- Full PCAP capture on all mirrored zones\n- Detection scoring with MITRE ATT&CK for ICS mapping\n- IOC submission and grading\n- Threat hunting and forensic analysis workflows\n\nRed Team (Automated Injects - Full Kill Chain):\n- IT reconnaissance and spearphishing\n- Active Directory credential harvesting\n- IT-to-OT pivot via jump host\n- OT protocol scanning and enumeration\n- HMI screen manipulation\n- PLC register/setpoint modification\n- Safety system bypass attempt",
       "tags": [],
       "version": "1.0",
       "path": "blueprints/ics-power-grid-defense-lab",
@@ -28,7 +28,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:4cda84fd74cf3339"
+      "checksum": "sha256:11ab44c29346e980"
     },
     {
       "id": "red-team-training-lab",
@@ -171,7 +171,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-historian:latest",
-      "checksum": "sha256:5db4b00e54341d43"
+      "checksum": "sha256:3bd2d2294d93cb13"
     },
     {
       "id": "ics-hmi",
@@ -188,7 +188,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-hmi:latest",
-      "checksum": "sha256:84b7e9edb16d5649"
+      "checksum": "sha256:12fa3399839006c8"
     },
     {
       "id": "ics-ot-firewall",
@@ -219,7 +219,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-plc-sim:latest",
-      "checksum": "sha256:3e152bc0fc8d3d20"
+      "checksum": "sha256:9c50dcfbc5ead798"
     },
     {
       "id": "kali-attack",
