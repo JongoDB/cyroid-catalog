@@ -33,6 +33,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     hydra medusa \
     # Wordlists (rockyou + dirb/dirbuster directory lists)
     wordlists dirb \
+    # SSH Server (needed when VM serves as SSH jump host or pivot target)
+    openssh-server \
     # Tunneling & Pivoting
     proxychains4 sshuttle openvpn \
     # Web Application Testing
@@ -115,6 +117,17 @@ if [ -n "$ip" ]; then\n\
         ip route add default via "$gateway" 2>/dev/null || true\n\
         echo "Default route set to $gateway"\n\
     fi\n\
+fi\n\
+# Start SSH server if installed (needed for jump host / pivot target roles)\n\
+if [ -x /usr/sbin/sshd ]; then\n\
+    mkdir -p /run/sshd\n\
+    ssh-keygen -A 2>/dev/null\n\
+    /usr/sbin/sshd 2>/dev/null && echo "sshd started"\n\
+fi\n\
+# Create lab user for credential reuse attack path\n\
+if ! id jsmith &>/dev/null; then\n\
+    useradd -m -s /bin/bash jsmith\n\
+    echo "jsmith:Summer2024" | chpasswd\n\
 fi\n' > /dockerstartup/kasm_post_run_root.sh \
     && chmod +x /dockerstartup/kasm_post_run_root.sh
 

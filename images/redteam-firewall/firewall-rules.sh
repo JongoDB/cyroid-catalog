@@ -95,6 +95,9 @@ iptables -A FORWARD -s ${INTERNET_NET} -d ${APP_SERVER} -p tcp --dport ${APP_SER
 # Jumpbox can SSH to any internal host (admin access)
 iptables -A FORWARD -s ${JUMPBOX} -d ${INTERNAL_NET} -p tcp --dport 22 -j ACCEPT
 
+# App server can SSH to internal hosts (lateral movement path for training)
+iptables -A FORWARD -s ${APP_SERVER} -d ${INTERNAL_NET} -p tcp --dport 22 -j ACCEPT
+
 # Webserver can reach database (application requirement)
 iptables -A FORWARD -s ${WEBSERVER} -d ${DB01} -p tcp --dport 3306 -j ACCEPT
 
