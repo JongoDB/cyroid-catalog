@@ -25,7 +25,7 @@ RUN wget -q -O /tmp/kali-key.asc https://archive.kali.org/archive-keyring.gpg \
     openssh-server \
     python3-pip python3-venv \
     curl wget vim tmux jq \
-    netcat-openbsd socat iproute2 \
+    netcat-openbsd socat iproute2 iputils-ping \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ICS Python libraries
