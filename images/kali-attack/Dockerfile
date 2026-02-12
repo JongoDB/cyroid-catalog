@@ -26,7 +26,7 @@ RUN wget -q -O /etc/apt/trusted.gpg.d/kali-archive-keyring.asc https://archive.k
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Network Reconnaissance & Scanning
     nmap masscan enum4linux enum4linux-ng ldap-utils dnsrecon dnsenum fierce \
-    netcat-openbsd socat tcpdump \
+    netcat-openbsd socat tcpdump iputils-ping \
     # Active Directory Tools
     evil-winrm impacket-scripts python3-impacket smbclient smbmap netexec samba-common-bin \
     # Password Attacks (online brute-force only)

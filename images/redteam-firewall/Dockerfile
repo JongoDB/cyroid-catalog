@@ -16,6 +16,11 @@
 
 FROM alpine:3.19
 
+# Firewall rules are configurable via environment variables.
+# Defaults match Red Team Training Lab v3 (Jenkins at .40:8080).
+# Override FW_APP_SERVER_PORT=80 for blueprints with WordPress at .40.
+ENV FW_APP_SERVER_PORT=8080
+
 COPY firewall-rules.sh /usr/local/bin/
 COPY entrypoint.sh /
 
