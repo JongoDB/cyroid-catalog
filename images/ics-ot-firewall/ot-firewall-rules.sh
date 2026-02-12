@@ -2,19 +2,35 @@
 # CYROID ICS OT Zone Firewall Rules
 # Enforces Purdue Model (IEC 62443) network segmentation
 #
-# Zones:
-#   IT/OT DMZ     (eth0) 172.16.2.0/24 - Jump host, historian mirror
-#   Operations    (eth1) 172.16.3.0/24 - Historian, OT engineering WS
-#   Supervisory   (eth2) 172.16.4.0/24 - HMIs
-#   Process Ctrl  (eth3) 172.16.5.0/24 - PLCs, RTUs
+# Zones (detected dynamically from interface IPs):
+#   IT/OT DMZ     172.16.2.0/24 - Jump host, historian mirror
+#   Operations    172.16.3.0/24 - Historian, OT engineering WS
+#   Supervisory   172.16.4.0/24 - HMIs
+#   Process Ctrl  172.16.5.0/24 - PLCs, RTUs
 
 set -e
 
-# Zone definitions
-DMZ_IF="eth0"
-OPS_IF="eth1"
-SUP_IF="eth2"
-PROC_IF="eth3"
+# Detect interfaces by subnet instead of relying on eth0-eth3 ordering.
+# Docker assigns interface names based on network connect order, which
+# varies depending on how the CYROID API provisions the container.
+detect_interface() {
+    local subnet_prefix="$1"
+    ip -4 addr show | grep "inet ${subnet_prefix}\." | awk '{print $NF}'
+}
+
+DMZ_IF=$(detect_interface "172.16.2")
+OPS_IF=$(detect_interface "172.16.3")
+SUP_IF=$(detect_interface "172.16.4")
+PROC_IF=$(detect_interface "172.16.5")
+
+for var in DMZ_IF OPS_IF SUP_IF PROC_IF; do
+    if [ -z "${!var}" ]; then
+        echo "ERROR: Could not detect interface for $var" >&2
+        exit 1
+    fi
+done
+
+echo "Detected interfaces: DMZ=$DMZ_IF OPS=$OPS_IF SUP=$SUP_IF PROC=$PROC_IF"
 
 DMZ_NET="172.16.2.0/24"
 OPS_NET="172.16.3.0/24"

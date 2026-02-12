@@ -4,6 +4,19 @@ set -e
 # CYROID Samba AD DC Entrypoint
 # Handles initial domain provisioning and configuration
 
+# Route through lab firewall gateway (.1) instead of Docker bridge
+configure_routing() {
+    local ip
+    ip=$(hostname -I | awk '{print $1}')
+    local gateway
+    gateway=$(echo "$ip" | sed 's/\.[0-9]*$/.1/')
+    if ! ip route show default | grep -q "via $gateway"; then
+        ip route del default 2>/dev/null || true
+        ip route add default via "$gateway" 2>/dev/null || true
+    fi
+}
+configure_routing
+
 echo "=== CYROID Samba AD DC ==="
 echo "Domain: ${SAMBA_DOMAIN}"
 echo "Realm: ${SAMBA_REALM}"

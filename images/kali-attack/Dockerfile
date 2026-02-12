@@ -102,7 +102,23 @@ RUN if [ -f /usr/share/wordlists/rockyou.txt.gz ]; then gunzip -k /usr/share/wor
 
 COPY TOOLS_CHEATSHEET.md /home/kasm-default-profile/TOOLS_CHEATSHEET.md
 
-# === LAYER 4: Fix permissions ===
+# === LAYER 4: Gateway routing fix ===
+# Docker assigns its bridge IP as default gateway, but CYROID labs use
+# firewall VMs at .1 on each subnet. Override at container startup.
+RUN printf '#!/usr/bin/env bash\n\
+echo "Configuring lab gateway routing..."\n\
+ip=$(hostname -I | awk "{print \\$1}")\n\
+if [ -n "$ip" ]; then\n\
+    gateway=$(echo "$ip" | sed "s/\\.[0-9]*$/.1/")\n\
+    if ! ip route show default | grep -q "via $gateway"; then\n\
+        ip route del default 2>/dev/null || true\n\
+        ip route add default via "$gateway" 2>/dev/null || true\n\
+        echo "Default route set to $gateway"\n\
+    fi\n\
+fi\n' > /dockerstartup/kasm_post_run_root.sh \
+    && chmod +x /dockerstartup/kasm_post_run_root.sh
+
+# === LAYER 5: Fix permissions ===
 RUN chown -R 1000:1000 /home/kasm-default-profile /opt/tools
 
 WORKDIR /home/kasm-user
