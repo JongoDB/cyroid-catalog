@@ -6,7 +6,7 @@ configure_routing() {
     local ip
     ip=$(hostname -I | awk '{print $1}')
     local gateway
-    gateway=$(echo "$ip" | sed 's/\.[0-9]*$/.253/')
+    gateway=$(echo "$ip" | sed 's/\.[0-9]*$/.1/')
     if ! ip route show default | grep -q "via $gateway"; then
         ip route del default 2>/dev/null || true
         ip route add default via "$gateway" 2>/dev/null || true
