@@ -117,6 +117,15 @@ if [ -n "$ip" ]; then\n\
         ip route add default via "$gateway" 2>/dev/null || true\n\
         echo "Default route set to $gateway"\n\
     fi\n\
+    # IT/OT DMZ hosts need routes to OT networks via OT firewall\n\
+    subnet=$(echo "$ip" | cut -d. -f1-3)\n\
+    if [ "$subnet" = "172.16.2" ]; then\n\
+        ot_gw="${subnet}.254"\n\
+        for net in 172.16.3.0/24 172.16.4.0/24 172.16.5.0/24; do\n\
+            ip route add "$net" via "$ot_gw" 2>/dev/null || true\n\
+        done\n\
+        echo "OT routes added via $ot_gw"\n\
+    fi\n\
 fi\n\
 # Start SSH server if installed (needed for jump host / pivot target roles)\n\
 if [ -x /usr/sbin/sshd ]; then\n\
