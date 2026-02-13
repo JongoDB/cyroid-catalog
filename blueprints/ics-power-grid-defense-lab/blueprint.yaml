@@ -130,6 +130,11 @@ vms:
   # ============================================================
 
   # Enterprise perimeter firewall (routes internet <-> enterprise <-> IT/OT DMZ)
+  # Env vars override redteam-firewall defaults to match ICS lab network layout:
+  #   DMZ_NET = enterprise (not a traditional DMZ — it's the corporate LAN)
+  #   INTERNAL_NET = IT/OT DMZ (the boundary between IT and OT)
+  #   WEBSERVER = corp-web (WordPress on port 80, not dc01)
+  #   APP_SERVER / APP_SERVER_PORT unused (no separate app server in this lab)
   - hostname: ent-firewall
     base_image_tag: "127.0.0.1:5000/cyroid/redteam-firewall:latest"
     network_interfaces:
@@ -140,6 +145,16 @@ vms:
         ip_address: "172.16.1.1"
       - network_name: it-ot-dmz
         ip_address: "172.16.2.1"
+    environment:
+      FW_INTERNET_NET: "172.16.0.0/24"
+      FW_DMZ_NET: "172.16.1.0/24"
+      FW_INTERNAL_NET: "172.16.2.0/24"
+      FW_NAT_IP: "172.16.0.100"
+      FW_WEBSERVER: "172.16.1.40"
+      FW_JUMPBOX: "172.16.1.20"
+      FW_APP_SERVER: "172.16.1.10"
+      FW_APP_SERVER_PORT: "445"
+      FW_EXTRA_FORWARD: "172.16.0.0/24:172.16.1.10:389,172.16.0.0/24:172.16.1.10:636,172.16.0.0/24:172.16.1.10:88"
     cpu: 1
     ram_mb: 512
     disk_gb: 10
