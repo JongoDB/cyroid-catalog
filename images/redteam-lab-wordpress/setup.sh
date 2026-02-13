@@ -97,6 +97,17 @@ HTACCESS
     echo "WordPress installation complete!"
 fi
 
+# Create matching Linux users for SSH credential reuse attack path
+# (WordPress users are created above, but SSH needs local accounts)
+if ! id jsmith &>/dev/null; then
+    useradd -m -s /bin/bash jsmith
+    echo "jsmith:Summer2024" | chpasswd
+fi
+if ! id mwilliams &>/dev/null; then
+    useradd -m -s /bin/bash mwilliams
+    echo "mwilliams:Welcome123" | chpasswd
+fi
+
 # Configure Apache to allow .htaccess overrides for permalinks
 if ! grep -q "AllowOverride All" /etc/apache2/apache2.conf; then
     sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf

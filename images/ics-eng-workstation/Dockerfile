@@ -22,9 +22,10 @@ RUN wget -q -O /tmp/kali-key.asc https://archive.kali.org/archive-keyring.gpg \
     && cp /tmp/kali-key.asc /usr/share/keyrings/kali-archive-keyring.gpg \
     && apt-get update && apt-get install -y --no-install-recommends \
     wireshark-common tshark tcpdump nmap \
+    openssh-server \
     python3-pip python3-venv \
     curl wget vim tmux jq \
-    netcat-openbsd socat iproute2 \
+    netcat-openbsd socat iproute2 iputils-ping \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ICS Python libraries
@@ -48,6 +49,26 @@ if [ -n "$ip" ]; then\n\
         ip route add default via "$gateway" 2>/dev/null || true\n\
         echo "Default route set to $gateway"\n\
     fi\n\
+    # IT/OT DMZ hosts need routes to OT networks via OT firewall\n\
+    subnet=$(echo "$ip" | cut -d. -f1-3)\n\
+    if [ "$subnet" = "172.16.2" ]; then\n\
+        ot_gw="${subnet}.254"\n\
+        for net in 172.16.3.0/24 172.16.4.0/24 172.16.5.0/24; do\n\
+            ip route add "$net" via "$ot_gw" 2>/dev/null || true\n\
+        done\n\
+        echo "OT routes added via $ot_gw"\n\
+    fi\n\
+fi\n\
+# Start SSH server if installed (needed for pivot target role)\n\
+if [ -x /usr/sbin/sshd ]; then\n\
+    mkdir -p /run/sshd\n\
+    ssh-keygen -A 2>/dev/null\n\
+    /usr/sbin/sshd 2>/dev/null && echo "sshd started"\n\
+fi\n\
+# Create lab user for credential reuse attack path\n\
+if ! id jsmith &>/dev/null; then\n\
+    useradd -m -s /bin/bash jsmith\n\
+    echo "jsmith:Summer2024" | chpasswd\n\
 fi\n' > /dockerstartup/kasm_post_run_root.sh \
     && chmod +x /dockerstartup/kasm_post_run_root.sh
 

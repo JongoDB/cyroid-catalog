@@ -25,9 +25,9 @@ echo "[*] Applying firewall rules..."
 
 echo "[*] Firewall ready!"
 echo "[*] NAT mappings:"
-echo "    172.16.0.100:80   -> 172.16.1.10:80  (webserver)"
-echo "    172.16.0.100:443  -> 172.16.1.10:443 (webserver)"
-echo "    172.16.0.100:8080 -> 172.16.1.40:8080 (jenkins)"
+echo "    ${FW_NAT_IP:-172.16.0.100}:80   -> ${FW_WEBSERVER:-172.16.1.10}:80  (webserver)"
+echo "    ${FW_NAT_IP:-172.16.0.100}:443  -> ${FW_WEBSERVER:-172.16.1.10}:443 (webserver)"
+echo "    ${FW_NAT_IP:-172.16.0.100}:8080 -> ${FW_APP_SERVER:-172.16.1.40}:${FW_APP_SERVER_PORT:-8080} (app server)"
 echo ""
 
 # Execute the command (default: tail -f /dev/null to keep container running)

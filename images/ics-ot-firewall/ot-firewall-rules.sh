@@ -108,8 +108,22 @@ iptables -A FORWARD -i $SUP_IF -o $SUP_IF -j ACCEPT
 iptables -A FORWARD -i $PROC_IF -o $PROC_IF -j ACCEPT
 
 # ============================================================
+# ALLOWED FLOWS: IT/OT DMZ -> Process Control (L3.5 -> L1)
+# ============================================================
+# Historian mirror polls PLCs directly (intentional misconfiguration
+# for training — DMZ should not have direct PLC access)
+iptables -A FORWARD -i $DMZ_IF -o $PROC_IF -s 172.16.2.20 -p tcp --dport $MODBUS_PORT -j ACCEPT
+iptables -A FORWARD -i $DMZ_IF -o $PROC_IF -s 172.16.2.20 -p tcp --dport $OPCUA_PORT -j ACCEPT
+iptables -A FORWARD -i $DMZ_IF -o $PROC_IF -s 172.16.2.20 -p tcp --dport $ENIP_PORT -j ACCEPT
+
+# ============================================================
+# ICMP (Allow ping for network recon and debugging)
+# ============================================================
+iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
+iptables -A FORWARD -p icmp --icmp-type echo-reply -j ACCEPT
+
+# ============================================================
 # BLOCKED (implicit by DROP policy):
-# - DMZ -> Process Control (no direct IT to PLC)
 # - DMZ -> Supervisory (no direct IT to HMI)
 # - Process Control -> anything except responses
 # - Any non-ICS protocol to Process Control

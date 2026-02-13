@@ -35,7 +35,7 @@
             {% for name, plc in plc_data.items() %}
             <div class="plc-card">
                 <h2>{{ name }} <span class="proto">{{ plc.protocol | upper }}</span></h2>
-                {% for reg_name, reg_val in plc.values.items() %}
+                {% for reg_name, reg_val in plc.registers.items() %}
                 <div class="register">
                     <span class="name">{{ reg_name }}</span>
                     <span class="value">{{ reg_val }}</span>
@@ -74,7 +74,7 @@
                     let html = '';
                     for (const [name, plc] of Object.entries(data)) {
                         html += `<div class="plc-card"><h2>${name} <span class="proto">${plc.protocol.toUpperCase()}</span></h2>`;
-                        for (const [reg, val] of Object.entries(plc.values)) {
+                        for (const [reg, val] of Object.entries(plc.registers)) {
                             html += `<div class="register"><span class="name">${reg}</span><span class="value">${typeof val === 'number' ? val.toFixed(2) : val}</span></div>`;
                         }
                         html += '</div>';
