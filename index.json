@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-12T01:12:22.842416+00:00"
+    "generated_at": "2026-02-13T17:43:42.278934+00:00"
   },
   "items": [
     {
@@ -28,7 +28,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:4b6acae0cb5a7381"
+      "checksum": "sha256:fedd84ab4845b112"
     },
     {
       "id": "red-team-training-lab",
@@ -154,7 +154,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-eng-workstation:latest",
-      "checksum": "sha256:9936c7769a0d127c"
+      "checksum": "sha256:32aae0499384b154"
     },
     {
       "id": "ics-historian",
@@ -171,7 +171,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-historian:latest",
-      "checksum": "sha256:3bd2d2294d93cb13"
+      "checksum": "sha256:cf86b75dd73420ea"
     },
     {
       "id": "ics-hmi",
@@ -188,7 +188,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-hmi:latest",
-      "checksum": "sha256:12fa3399839006c8"
+      "checksum": "sha256:6b57dbbaac37c873"
     },
     {
       "id": "ics-ot-firewall",
@@ -202,7 +202,7 @@
       "path": "images/ics-ot-firewall",
       "arch": "x86_64",
       "docker_tag": "cyroid/ics-ot-firewall:latest",
-      "checksum": "sha256:8bc6254a89214ddf"
+      "checksum": "sha256:4a4422dac5db58a5"
     },
     {
       "id": "ics-plc-sim",
@@ -219,7 +219,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/ics-plc-sim:latest",
-      "checksum": "sha256:9c50dcfbc5ead798"
+      "checksum": "sha256:06e6186d2aae92c3"
     },
     {
       "id": "kali-attack",
@@ -236,7 +236,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:d51427f961dd810d"
+      "checksum": "sha256:cff426a27c31a3e1"
     },
     {
       "id": "redteam-firewall",
@@ -250,7 +250,7 @@
       "path": "images/redteam-firewall",
       "arch": "x86_64",
       "docker_tag": "latest",
-      "checksum": "sha256:94a2775b5cabd065"
+      "checksum": "sha256:1db381503a6982b1"
     },
     {
       "id": "redteam-ftp",
@@ -320,7 +320,7 @@
       "path": "images/redteam-lab-wordpress",
       "arch": "x86_64",
       "docker_tag": "cyroid/redteam-lab-wordpress:latest",
-      "checksum": "sha256:a72c9a8ee37f62ba"
+      "checksum": "sha256:57c6844544e214d6"
     },
     {
       "id": "redteam-lab-workstation",
@@ -404,7 +404,7 @@
       "path": "images/samba-dc",
       "arch": "both",
       "docker_tag": "cyroid/samba-dc:latest",
-      "checksum": "sha256:f202cd72c85b626a"
+      "checksum": "sha256:cebe4e85e2c83bc9"
     },
     {
       "id": "windows-server-2019",
