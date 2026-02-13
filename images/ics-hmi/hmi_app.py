@@ -79,10 +79,12 @@ def poll_modbus(target):
         from pymodbus.client import ModbusTcpClient
         client = ModbusTcpClient(target["host"], port=target.get("port", 502), timeout=3)
         if client.connect():
-            result = client.read_holding_registers(0, 50, slave=1)
+            for count in (50, 40, 20, 10):
+                result = client.read_holding_registers(0, count, slave=1)
+                if not result.isError():
+                    client.close()
+                    return {str(i): v for i, v in enumerate(result.registers)}
             client.close()
-            if not result.isError():
-                return {str(i): v for i, v in enumerate(result.registers)}
     except Exception as e:
         log.debug(f"Modbus poll error for {target['host']}: {e}")
     return None
@@ -118,19 +120,38 @@ def poll_opcua(target):
     return None
 
 
+ENIP_TAGS = [
+    "Turbine_Speed_RPM", "Generator_Output_MW", "Generator_Voltage_kV",
+    "Generator_Current_A", "Frequency_Hz", "Steam_Pressure_PSI",
+    "Steam_Temperature_C", "Governor_Position_Pct", "Exciter_Voltage_V",
+    "Bearing_Temperature_C", "Lube_Oil_Pressure_PSI", "Vibration_mm_s",
+    "Breaker_Status", "Sync_Check_Status", "Auto_Voltage_Reg_Mode",
+]
+
+
 def poll_enip(target):
-    """Poll an EtherNet/IP device."""
-    # Simplified - reads tags via cpppo client
+    """Poll an EtherNet/IP device using cpppo client."""
     try:
         import subprocess
         result = subprocess.run(
             ["python3", "-m", "cpppo.server.enip.client",
              "--address", f"{target['host']}:{target.get('port', 44818)}",
-             "--print", "scada[0-9]"],
-            capture_output=True, text=True, timeout=5
+             "--print"] + ENIP_TAGS,
+            capture_output=True, text=True, timeout=10
         )
-        if result.returncode == 0 and result.stdout.strip():
-            return {"raw": result.stdout.strip()}
+        if result.stdout.strip():
+            data = {}
+            for line in result.stdout.strip().split("\n"):
+                if "==" in line:
+                    parts = line.split("==")
+                    tag = parts[0].strip()
+                    val_str = parts[1].strip().split(":")[0].strip()
+                    val_str = val_str.strip("[] ")
+                    try:
+                        data[tag] = round(float(val_str), 2)
+                    except ValueError:
+                        data[tag] = val_str
+            return data if data else None
     except Exception as e:
         log.debug(f"EtherNet/IP poll error for {target['host']}: {e}")
     return None
@@ -154,7 +175,7 @@ def polling_loop():
                 if data:
                     with plc_data_lock:
                         plc_data[target.get("name", target["host"])] = {
-                            "values": data,
+                            "registers": data,
                             "protocol": proto,
                             "host": target["host"],
                             "last_update": time.time(),

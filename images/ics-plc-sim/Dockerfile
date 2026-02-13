@@ -22,7 +22,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --no-cache-dir \
     pymodbus==3.7.4 \
     asyncua==1.1.5 \
-    cpppo==4.4.2
+    cpppo==4.4.2 \
+    && python3 -c "\
+import pathlib, re; \
+p = pathlib.Path('/usr/local/lib/python3.12/site-packages/cpppo/misc.py'); \
+src = p.read_text(); \
+patched = re.sub( \
+    r'(def change_function\(function, \*\*kwds\):)\n.*?(?=\nlogging\.)', \
+    r'\1\n    return function\n', \
+    src, count=1, flags=re.DOTALL); \
+p.write_text(patched); \
+print('Patched cpppo/misc.py change_function for Python 3.12+')"
 
 COPY plc_sim.py /app/plc_sim.py
 COPY registers/ /app/registers/
