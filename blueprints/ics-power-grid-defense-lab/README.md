@@ -85,19 +85,19 @@ L5 INTERNET            L4 ENTERPRISE           L3.5 IT/OT DMZ         L3 OPERATI
 | eng-ws | L4 | enterprise | .1.30 | Engineer workstation | - | redteam-lab-workstation |
 | corp-web | L4 | enterprise | .1.40 | Corporate web portal | - | redteam-lab-wordpress |
 | jump-host | L3.5 | it-ot-dmz | .2.10 | IT-to-OT access point | - | kali-attack |
-| hist-mirror | L3.5 | it-ot-dmz | .2.20 | Read-only historian mirror | - | kali-attack |
-| ot-firewall | L3/L3.5 | dmz/ops/sup/proc | .2.254/.3.1/.4.1/.5.1 | OT perimeter | - | redteam-firewall |
-| historian | L3 | operations | .3.10 | Process data historian | - | kali-attack |
-| eng-ws-ot | L3 | operations | .3.20 | OT engineering workstation | - | kali-attack |
-| hmi-sub | L2 | supervisory + proc | .4.10/.5.100 | Substation operations | DNP3/Modbus | kali-attack |
-| hmi-gen | L2 | supervisory + proc | .4.20/.5.101 | Generation plant control | EIP/Modbus | kali-attack |
-| hmi-grid | L2 | supervisory | .4.30 | Grid overview / EMS | All (read) | kali-attack |
-| plc-sub-a | L1 | process-control | .5.10 | Protection relay | DNP3 | kali-attack |
-| plc-sub-b | L1 | process-control | .5.20 | Breaker controller | Modbus TCP | kali-attack |
-| plc-gen | L1 | process-control | .5.30 | Turbine governor | EtherNet/IP | kali-attack |
-| plc-load | L1 | process-control | .5.40 | Load management | Modbus TCP | kali-attack |
-| plc-safety | L1 | process-control | .5.50 | Safety system (SIS) | OPC UA | kali-attack |
-| rtu-dist | L1 | process-control | .5.60 | Distribution RTU | DNP3 | kali-attack |
+| hist-mirror | L3.5 | it-ot-dmz | .2.20 | Read-only historian mirror | - | ics-historian |
+| ot-firewall | L3/L3.5 | dmz/ops/sup/proc | .2.254/.3.1/.4.1/.5.1 | OT perimeter | - | ics-ot-firewall |
+| historian | L3 | operations | .3.10 | Process data historian | - | ics-historian |
+| eng-ws-ot | L3 | operations | .3.20 | OT engineering workstation | - | ics-eng-workstation |
+| hmi-sub | L2 | supervisory + proc | .4.10/.5.100 | Substation operations | DNP3/Modbus | ics-hmi |
+| hmi-gen | L2 | supervisory + proc | .4.20/.5.101 | Generation plant control | EIP/Modbus | ics-hmi |
+| hmi-grid | L2 | supervisory | .4.30 | Grid overview / EMS | All (read) | ics-hmi |
+| plc-sub-a | L1 | process-control | .5.10 | Protection relay | DNP3 | ics-plc-sim |
+| plc-sub-b | L1 | process-control | .5.20 | Breaker controller | Modbus TCP | ics-plc-sim |
+| plc-gen | L1 | process-control | .5.30 | Turbine governor | EtherNet/IP | ics-plc-sim |
+| plc-load | L1 | process-control | .5.40 | Load management | Modbus TCP | ics-plc-sim |
+| plc-safety | L1 | process-control | .5.50 | Safety system (SIS) | OPC UA | ics-plc-sim |
+| rtu-dist | L1 | process-control | .5.60 | Distribution RTU | DNP3 | ics-plc-sim |
 | ids-sensor | SOC | soc + monitor | .6.10 | Suricata IDS | - | kali-attack |
 | siem | SOC | soc | .6.20 | Wazuh SIEM | - | kali-attack |
 | soc-analyst | SOC | soc | .6.100 | Student workstation | - | kali-attack |
