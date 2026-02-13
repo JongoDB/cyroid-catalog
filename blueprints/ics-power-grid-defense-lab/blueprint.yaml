@@ -241,7 +241,7 @@ vms:
     base_image_tag: "127.0.0.1:5000/cyroid/ics-ot-firewall:latest"
     network_interfaces:
       - network_name: it-ot-dmz
-        ip_address: "172.16.2.254"
+        ip_address: "172.16.2.253"
         is_primary: true
       - network_name: operations
         ip_address: "172.16.3.1"

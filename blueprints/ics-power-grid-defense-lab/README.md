@@ -38,7 +38,7 @@ L5 INTERNET            L4 ENTERPRISE           L3.5 IT/OT DMZ         L3 OPERATI
        │               │    .1.40     │               │                      │
        │               └──────┬───────┘        ┌──────┴───────┐              │
        │                      │                │ ot-firewall  │──────────────┘
-       │               ┌──────┴───────┐        │  .2.254      │
+       │               ┌──────┴───────┐        │  .2.253      │
        └──────────────▶│ ent-firewall │────────┤  .3.1        │
                        │  .0.1        │        │  .4.1        │
                        │  .1.1        │        │  .5.1        │
@@ -86,7 +86,7 @@ L5 INTERNET            L4 ENTERPRISE           L3.5 IT/OT DMZ         L3 OPERATI
 | corp-web | L4 | enterprise | .1.40 | Corporate web portal | - | redteam-lab-wordpress |
 | jump-host | L3.5 | it-ot-dmz | .2.10 | IT-to-OT access point | - | kali-attack |
 | hist-mirror | L3.5 | it-ot-dmz | .2.20 | Read-only historian mirror | - | ics-historian |
-| ot-firewall | L3/L3.5 | dmz/ops/sup/proc | .2.254/.3.1/.4.1/.5.1 | OT perimeter | - | ics-ot-firewall |
+| ot-firewall | L3/L3.5 | dmz/ops/sup/proc | .2.253/.3.1/.4.1/.5.1 | OT perimeter | - | ics-ot-firewall |
 | historian | L3 | operations | .3.10 | Process data historian | - | ics-historian |
 | eng-ws-ot | L3 | operations | .3.20 | OT engineering workstation | - | ics-eng-workstation |
 | hmi-sub | L2 | supervisory + proc | .4.10/.5.100 | Substation operations | DNP3/Modbus | ics-hmi |
