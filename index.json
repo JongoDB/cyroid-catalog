@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-13T18:19:38.004732+00:00"
+    "generated_at": "2026-02-13T19:27:37.646766+00:00"
   },
   "items": [
     {
@@ -28,7 +28,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:0f1432e1cb3b703a"
+      "checksum": "sha256:8f0d0d842a770b54"
     },
     {
       "id": "red-team-training-lab",
@@ -250,7 +250,7 @@
       "path": "images/redteam-firewall",
       "arch": "x86_64",
       "docker_tag": "latest",
-      "checksum": "sha256:1db381503a6982b1"
+      "checksum": "sha256:77c2310afe69086b"
     },
     {
       "id": "redteam-ftp",
