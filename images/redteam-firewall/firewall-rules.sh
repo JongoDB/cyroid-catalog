@@ -129,6 +129,21 @@ iptables -A FORWARD -s ${DMZ_NET} -d ${DMZ_NET} -j ACCEPT
 iptables -A FORWARD -s ${INTERNAL_NET} -d ${INTERNAL_NET} -j ACCEPT
 
 # ============================================================================
+# EXTRA FORWARD RULES (blueprint-specific overrides)
+# ============================================================================
+# FW_EXTRA_FORWARD: comma-separated rules in "src:dst:port" format
+# Example: FW_EXTRA_FORWARD="172.16.0.0/24:172.16.1.10:389,172.16.0.0/24:172.16.1.10:636"
+if [ -n "${FW_EXTRA_FORWARD:-}" ]; then
+    IFS=',' read -ra EXTRA_RULES <<< "${FW_EXTRA_FORWARD}"
+    for rule in "${EXTRA_RULES[@]}"; do
+        IFS=':' read -r src dst port <<< "$rule"
+        if [ -n "$src" ] && [ -n "$dst" ] && [ -n "$port" ]; then
+            iptables -A FORWARD -s "$src" -d "$dst" -p tcp --dport "$port" -j ACCEPT
+        fi
+    done
+fi
+
+# ============================================================================
 # ICMP (Allow ping for recon/debugging)
 # ============================================================================
 iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
