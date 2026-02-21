@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T23:08:13.949725+00:00"
+    "generated_at": "2026-02-21T23:20:34.171459+00:00"
   },
   "items": [
     {
@@ -115,10 +115,12 @@
         "wh-weather-server",
         "wh-c2-server"
       ],
-      "requires_base_images": [],
+      "requires_base_images": [
+        "windows-11-pro"
+      ],
       "includes_msel": true,
       "includes_content": false,
-      "checksum": "sha256:52d8a1a1516167d1"
+      "checksum": "sha256:1fa2bb8b95a4d62d"
     },
     {
       "id": "watering-hole-attack-amazing",

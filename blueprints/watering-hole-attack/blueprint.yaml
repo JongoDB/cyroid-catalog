@@ -16,6 +16,9 @@ description: |
 
 base_subnet_prefix: "10.10"
 
+requires_base_images:
+  - windows-11-pro
+
 networks:
   - name: user-net
     subnet: "10.10.1.0/24"
