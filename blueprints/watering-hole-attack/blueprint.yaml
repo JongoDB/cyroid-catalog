@@ -1,0 +1,96 @@
+# CYROID Watering Hole Attack Blueprint
+seed_id: watering-hole-attack
+name: Watering Hole Attack
+description: |
+  Watering hole attack training scenario featuring:
+  - Windows 11 victim client on the user network
+  - Compromised weather website (nginx + Express) serving Sliver implants
+  - Hidden Sliver C2 server on an isolated subnet
+  - Dual-homed weather server bridging user and C2 networks
+
+  The weather server proxies C2 callbacks (/api/news/) to the hidden Sliver
+  server. The Windows client has no direct route to the C2 network, mimicking
+  real-world watering hole infrastructure.
+
+  Attack flow: Browse weather site → Click ad → Download implant → C2 callback
+
+base_subnet_prefix: "10.10"
+
+networks:
+  - name: user-net
+    subnet: "10.10.1.0/24"
+    gateway: "10.10.1.1"
+    is_isolated: true
+
+  - name: c2-net
+    subnet: "10.10.2.0/24"
+    gateway: "10.10.2.1"
+    is_isolated: true
+
+vms:
+  # Windows 11 victim - browses to weather site and downloads implant
+  - hostname: win11-client
+    base_image_tag: "dockurr/windows:11"
+    network_name: user-net
+    ip_address: "10.10.1.10"
+    cpu: 2
+    ram_mb: 4096
+    disk_gb: 64
+    position_x: 100
+    position_y: 200
+
+  # Weather server - dual-homed, proxies C2 traffic through nginx
+  - hostname: weather-server
+    base_image_tag: "127.0.0.1:5000/cyroid/wh-weather-server:latest"
+    network_interfaces:
+      - network_name: user-net
+        ip_address: "10.10.1.20"
+        is_primary: true
+      - network_name: c2-net
+        ip_address: "10.10.2.20"
+        is_primary: false
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 400
+    position_y: 100
+    environment:
+      DOMAIN: "10.10.1.20"
+      USE_TLS: "false"
+      SLIVER_C2_HOST: "10.10.2.30"
+      SLIVER_HTTP_PORT: "8080"
+      SLIVER_C2_PATH: "/api/news/"
+
+  # Sliver C2 server - hidden on the C2 network
+  - hostname: c2-server
+    base_image_tag: "127.0.0.1:5000/cyroid/wh-c2-server:latest"
+    network_name: c2-net
+    ip_address: "10.10.2.30"
+    cpu: 2
+    ram_mb: 2048
+    disk_gb: 20
+    position_x: 400
+    position_y: 300
+    environment:
+      SLIVER_HTTP_PORT: "8080"
+
+router:
+  enabled: true
+  dhcp_enabled: false
+
+# Training scenario events (MSEL)
+events:
+  - sequence: 1
+    delay_minutes: 0
+    title: "Phase 1: Environment Setup"
+    description: "White Cell configures Sliver C2 listener and generates implant"
+
+  - sequence: 2
+    delay_minutes: 15
+    title: "Phase 2: Attack Execution"
+    description: "Victim browses to weather site and downloads trojanized installer"
+
+  - sequence: 3
+    delay_minutes: 30
+    title: "Phase 3: Incident Response"
+    description: "Students investigate SOC alert about suspicious outbound traffic"
