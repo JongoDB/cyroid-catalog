@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     iproute2 \
     vim \
+    jq \
     mingw-w64 \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
@@ -28,14 +29,21 @@ RUN install -m 0755 -d /etc/apt/keyrings \
     && apt-get install -y docker-ce docker-ce-cli containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Sliver C2
-RUN curl https://sliver.sh/install | bash
+# Install Sliver C2 (direct binary download - avoids systemd dependency in install script)
+RUN ARCH=$(uname -m | sed "s/x86_64/amd64/" | sed "s/aarch64/arm64/") \
+    && SLIVER_URL=$(curl -s https://api.github.com/repos/BishopFox/sliver/releases/latest \
+       | jq -r ".assets[] | select(.name | test(\"sliver-server_linux-${ARCH}\")) | .browser_download_url" | head -1) \
+    && curl -fSL -o /usr/local/bin/sliver-server "$SLIVER_URL" \
+    && chmod +x /usr/local/bin/sliver-server
 
 # Clone the sliver-weather repo (for implant builds directory structure)
 RUN git clone https://github.com/jongodb/sliver-weather.git /opt/sliver-weather
 
 # Create builds directory for implants
 RUN mkdir -p /home/sliver/builds
+
+# Unpack Sliver (generates configs, downloads assets on first run)
+RUN sliver-server unpack --force || true
 
 # Copy startup script
 COPY entrypoint.sh /entrypoint.sh
