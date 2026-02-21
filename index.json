@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T23:20:34.171459+00:00"
+    "generated_at": "2026-02-21T23:23:50.395136+00:00"
   },
   "items": [
     {
@@ -488,7 +488,7 @@
       "path": "images/wh-c2-server",
       "arch": "x86_64",
       "docker_tag": "cyroid/wh-c2-server:latest",
-      "checksum": "sha256:8705c40e2232d44f"
+      "checksum": "sha256:cb6742d7cd4ac974"
     },
     {
       "id": "wh-weather-server",

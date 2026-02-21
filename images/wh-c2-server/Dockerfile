@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     iproute2 \
     vim \
     jq \
+    supervisor \
     mingw-w64 \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
@@ -45,6 +46,9 @@ RUN mkdir -p /home/sliver/builds
 # Unpack Sliver (generates configs, downloads assets on first run)
 RUN sliver-server unpack --force || true
 
+# Supervisor to manage sliver daemon
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Copy startup script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -53,4 +57,4 @@ EXPOSE 8080 31337
 
 WORKDIR /home/sliver
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["tail", "-f", "/dev/null"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
