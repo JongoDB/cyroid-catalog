@@ -30,6 +30,9 @@ description: |
 version: "1.0"
 base_subnet_prefix: "10.100"
 
+requires_base_images:
+  - windows-11-pro
+
 networks:
   - name: user-space
     subnet: "10.100.0.0/24"

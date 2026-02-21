@@ -88,6 +88,9 @@ def scan_blueprints() -> list[dict]:
         if walkthrough:
             tags = walkthrough.get("tags", [])
 
+        # Explicit base image dependencies from blueprint.yaml
+        requires_base_images = bp.get("requires_base_images", [])
+
         items.append({
             "id": bp_dir.name,
             "type": "blueprint",
@@ -97,6 +100,7 @@ def scan_blueprints() -> list[dict]:
             "version": bp.get("version") or walkthrough.get("version", "1.0"),
             "path": f"blueprints/{bp_dir.name}",
             "requires_images": requires_images,
+            "requires_base_images": requires_base_images,
             "includes_msel": has_msel,
             "includes_content": has_content,
             "checksum": dir_checksum(bp_dir),

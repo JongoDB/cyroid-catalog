@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T21:27:30.501886+00:00"
+    "generated_at": "2026-02-21T21:31:20.331901+00:00"
   },
   "items": [
     {
@@ -26,6 +26,7 @@
         "ics-hmi",
         "ics-plc-sim"
       ],
+      "requires_base_images": [],
       "includes_msel": true,
       "includes_content": true,
       "checksum": "sha256:8f0d0d842a770b54"
@@ -49,6 +50,7 @@
         "redteam-lab-workstation",
         "samba-dc"
       ],
+      "requires_base_images": [],
       "includes_msel": true,
       "includes_content": false,
       "checksum": "sha256:6902c1f4b625a6b8"
@@ -68,6 +70,7 @@
         "redteam-lab-workstation",
         "samba-dc"
       ],
+      "requires_base_images": [],
       "includes_msel": false,
       "includes_content": true,
       "checksum": "sha256:92834fda54c53698"
@@ -95,6 +98,7 @@
         "redteam-ticketing",
         "redteam-mysql"
       ],
+      "requires_base_images": [],
       "includes_msel": true,
       "includes_content": true,
       "checksum": "sha256:2ed40eb1c841b4d6"
@@ -111,9 +115,12 @@
         "sliver-weather",
         "c2-operator"
       ],
+      "requires_base_images": [
+        "windows-11-pro"
+      ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:3e1156934a18f3a0"
+      "checksum": "sha256:9c41870f4303fc54"
     },
     {
       "id": "apt-intrusion",
