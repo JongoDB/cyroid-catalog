@@ -33,7 +33,7 @@ networks:
 vms:
   # Windows 11 victim - browses to weather site and downloads implant
   - hostname: win11-client
-    base_image_tag: "dockurr/windows:11"
+    base_image_tag: "dockurr/windows:latest"
     network_name: user-net
     ip_address: "10.10.1.10"
     cpu: 2

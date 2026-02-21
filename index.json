@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T23:23:50.395136+00:00"
+    "generated_at": "2026-02-21T23:41:55.964572+00:00"
   },
   "items": [
     {
@@ -120,7 +120,7 @@
       ],
       "includes_msel": true,
       "includes_content": false,
-      "checksum": "sha256:1fa2bb8b95a4d62d"
+      "checksum": "sha256:fed77d75334e74ca"
     },
     {
       "id": "watering-hole-attack-amazing",
