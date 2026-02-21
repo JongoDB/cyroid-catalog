@@ -1,0 +1,19 @@
+name: Sliver Weather Listening Post
+tag: "cyroid/sliver-weather:latest"
+description: |
+  All-in-one watering hole website and Sliver C2 listening post.
+  Bundles nginx, a React weather app, and the Sliver C2 server
+  into a single container using supervisord.
+
+  Services:
+  - Nginx reverse proxy (ports 80/443)
+  - Weather app with trojanized download link (port 3001 internal)
+  - Sliver C2 server (mTLS 31337, operator gRPC 31338)
+
+  Clones https://github.com/jongodb/sliver-weather at build time.
+  Generates a self-signed TLS cert and Sliver operator config on first boot.
+arch: x86_64
+category: c2
+container_config:
+  cap_add:
+    - NET_ADMIN

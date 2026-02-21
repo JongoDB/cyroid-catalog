@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-13T19:27:37.646766+00:00"
+    "generated_at": "2026-02-21T21:19:46.635814+00:00"
   },
   "items": [
     {
@@ -100,6 +100,22 @@
       "checksum": "sha256:2ed40eb1c841b4d6"
     },
     {
+      "id": "watering-hole-attack-amazing",
+      "type": "blueprint",
+      "name": "Watering Hole Attack Amazing",
+      "description": "Demonstrates client-side exploitation via a watering hole attack.\nA victim Windows 11 workstation browses to a compromised weather website\n(sliver-weather), downloads a trojanized application containing a Sliver C2\nimplant, which calls back to the listening post. A blue-space Ubuntu operator\nmachine manages the C2 sessions.\n\nPurpose: Train IT staff on how client exploitation works.\n\nAttack Flow:\n1. Victim browses to weather website (watering hole)\n2. Downloads trojanized \"AtmosVision Pro\" installer\n3. Implant executes and calls back to Sliver C2 listening post\n4. Operator manages C2 sessions from blue-space Ubuntu desktop\n\nNetwork Segments:\n- User Space: Corporate victim workstation\n- DMZ: Watering hole website / C2 listening post\n- Blue Space: C2 operator console (isolated management network)\n\nVMs:\n- Windows 11 Pro x86_64 (victim workstation)\n- Sliver-Weather all-in-one (nginx + weather app + Sliver C2)\n- Ubuntu KasmVNC Desktop (C2 operator with Sliver client)",
+      "tags": [],
+      "version": "1.0",
+      "path": "blueprints/watering-hole-attack-amazing",
+      "requires_images": [
+        "sliver-weather",
+        "c2-operator"
+      ],
+      "includes_msel": true,
+      "includes_content": true,
+      "checksum": "sha256:3e1156934a18f3a0"
+    },
+    {
       "id": "apt-intrusion",
       "type": "scenario",
       "name": "APT Intrusion",
@@ -138,6 +154,20 @@
       "version": "1.0",
       "path": "scenarios/ransomware-attack.yaml",
       "checksum": "sha256:fde2b73c3f3a894d"
+    },
+    {
+      "id": "c2-operator",
+      "type": "image",
+      "name": "C2 Operator Console",
+      "description": "Ubuntu KasmVNC desktop pre-configured for C2 operations.\nIncludes the Sliver client, network analysis tools, and a\ndesktop quickstart guide for connecting to a Sliver C2 server.\n\nPre-installed tools:\n- Sliver client (for C2 session management)\n- nmap, tcpdump, tshark, Wireshark\n- curl, wget, dnsutils, whois\n- Python 3, SSH client\n\nUse with the sliver-weather listening post image.",
+      "tags": [
+        "c2"
+      ],
+      "version": "1.0",
+      "path": "images/c2-operator",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/c2-operator:latest",
+      "checksum": "sha256:323f2d8a8205b4c6"
     },
     {
       "id": "ics-eng-workstation",
@@ -405,6 +435,20 @@
       "arch": "both",
       "docker_tag": "cyroid/samba-dc:latest",
       "checksum": "sha256:cebe4e85e2c83bc9"
+    },
+    {
+      "id": "sliver-weather",
+      "type": "image",
+      "name": "Sliver Weather Listening Post",
+      "description": "All-in-one watering hole website and Sliver C2 listening post.\nBundles nginx, a React weather app, and the Sliver C2 server\ninto a single container using supervisord.\n\nServices:\n- Nginx reverse proxy (ports 80/443)\n- Weather app with trojanized download link (port 3001 internal)\n- Sliver C2 server (mTLS 31337, operator gRPC 31338)\n\nClones https://github.com/jongodb/sliver-weather at build time.\nGenerates a self-signed TLS cert and Sliver operator config on first boot.",
+      "tags": [
+        "c2"
+      ],
+      "version": "1.0",
+      "path": "images/sliver-weather",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/sliver-weather:latest",
+      "checksum": "sha256:be24d36a02c1aa77"
     },
     {
       "id": "windows-server-2019",
