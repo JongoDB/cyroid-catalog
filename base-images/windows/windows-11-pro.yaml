@@ -1,0 +1,29 @@
+# CYROID Windows 11 Pro Template
+seed_id: windows-11-pro
+name: "Windows 11 Pro"
+os_family: windows-desktop
+os_version: "11"
+description: |
+  Windows 11 Pro as a full virtual machine (x86_64).
+  Suitable for end-user workstations, training victim machines,
+  and general Windows desktop workloads.
+
+os_type: windows
+os_variant: "Windows 11 Pro"
+vm_type: windows_vm
+base_image: dockurr/windows:latest
+
+default_cpu: 4
+default_ram_mb: 8192
+default_disk_gb: 64
+
+native_arch: x86_64
+
+tags:
+  - desktop
+  - windows
+  - workstation
+
+config:
+  windows_version: "11"
+  display_type: desktop
