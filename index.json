@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T21:24:10.119848+00:00"
+    "generated_at": "2026-02-21T21:26:58.368393+00:00"
   },
   "items": [
     {
@@ -488,6 +488,19 @@
       "path": "base-images/windows/windows-server-2025.yaml",
       "arch": "x86_64",
       "checksum": "sha256:1eb71838a2f31d7d"
+    },
+    {
+      "id": "windows-11-pro",
+      "type": "base_image",
+      "name": "Windows 11 Pro",
+      "description": "Windows 11 Pro desktop workstation",
+      "tags": [
+        "desktop"
+      ],
+      "version": "1.0",
+      "path": "base-images/windows/windows-11-pro.yaml",
+      "arch": "x86_64",
+      "checksum": "sha256:821a0fdf31003f65"
     },
     {
       "id": "windows-dc-2022",

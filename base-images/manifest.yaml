@@ -17,6 +17,11 @@ templates:
     file: windows/windows-server-2025.yaml
     category: server
     arch: x86_64
+  - seed_id: windows-11-pro
+    file: windows/windows-11-pro.yaml
+    category: desktop
+    arch: x86_64
+    description: "Windows 11 Pro desktop workstation"
   - seed_id: windows-dc-2022
     file: windows/windows-dc-2022.yaml
     category: infrastructure
