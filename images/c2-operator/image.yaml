@@ -1,16 +1,15 @@
-name: C2 Operator Console
+name: C2 Operator (Sliver Server)
 tag: "cyroid/c2-operator:latest"
 description: |
-  Ubuntu KasmVNC desktop pre-configured for C2 operations.
-  Includes the Sliver client, network analysis tools, and a
-  desktop quickstart guide for connecting to a Sliver C2 server.
+  Sliver C2 server with auto-start HTTP listener.
+  Based on the sliver service from the sliver-weather training lab.
 
-  Pre-installed tools:
-  - Sliver client (for C2 session management)
-  - nmap, tcpdump, tshark, Wireshark
-  - curl, wget, dnsutils, whois
-  - Python 3, SSH client
+  Auto-starts an HTTP C2 listener on SLIVER_HTTP_PORT (default 8080).
+  Designed to receive proxied C2 traffic from the weather frontend's
+  nginx reverse proxy.
 
-  Use with the sliver-weather listening post image.
+  Environment variables:
+  - SLIVER_HTTP_PORT: HTTP listener port (default: 8080)
+  - SLIVER_AUTOSTART_HTTP: Set to 0 to disable auto-start (default: 1)
 arch: x86_64
 category: c2

