@@ -4,10 +4,10 @@ seed_id: watering-hole-attack-amazing
 name: Watering Hole Attack Amazing
 description: |
   Demonstrates client-side exploitation via a watering hole attack.
-  A victim Windows 11 workstation browses to a compromised weather website
-  (sliver-weather), downloads a trojanized application containing a Sliver C2
-  implant, which calls back to the listening post. A blue-space Ubuntu operator
-  machine manages the C2 sessions.
+  Victim workstations (Windows 11 and Ubuntu Linux) browse to a compromised
+  weather website (sliver-weather), download a trojanized application containing
+  a Sliver C2 implant, which calls back to the listening post. A blue-space
+  Ubuntu operator machine manages the C2 sessions.
 
   Purpose: Train IT staff on how client exploitation works.
 
@@ -18,12 +18,13 @@ description: |
   4. Operator manages C2 sessions from blue-space Ubuntu desktop
 
   Network Segments:
-  - User Space: Corporate victim workstation
+  - User Space: Corporate victim workstations (Windows + Linux)
   - DMZ: Watering hole website / C2 listening post
   - Blue Space: C2 operator console (isolated management network)
 
   VMs:
   - Windows 11 Pro x86_64 (victim workstation)
+  - Ubuntu Desktop (Linux victim workstation)
   - Sliver-Weather all-in-one (nginx + weather app + Sliver C2)
   - Ubuntu KasmVNC Desktop (C2 operator with Sliver client)
 
@@ -57,7 +58,7 @@ networks:
 
 vms:
   # ==========================================================================
-  # USER SPACE (10.100.0.0/24) - Victim workstation
+  # USER SPACE (10.100.0.0/24) - Victim workstations
   # ==========================================================================
 
   # Windows 11 victim - browses to watering hole, downloads and runs implant
@@ -86,7 +87,26 @@ vms:
       CPU_CORES: "4"
       RAM_SIZE: "8192M"
     position_x: 100
-    position_y: 300
+    position_y: 200
+
+  # Linux victim - browses to watering hole, downloads and runs implant
+  - hostname: victim-linux
+    os_type: linux
+    vm_type: container
+    base_image_tag: "linuxserver/webtop:ubuntu-xfce"
+    network_interfaces:
+      - network_name: user-space
+        ip_address: "10.100.0.20"
+        is_primary: true
+    cpu: 2
+    ram_mb: 4096
+    disk_gb: 20
+    environment:
+      CUSTOM_USER: "trainee"
+      PASSWORD: "Training123!"
+      SUDO_ACCESS: "true"
+    position_x: 100
+    position_y: 400
 
   # ==========================================================================
   # DMZ (10.100.1.0/24) + BLUE SPACE (10.100.2.0/24) - Listening post
@@ -150,7 +170,7 @@ events:
     description: |
       Verify all VMs are running. From c2-operator (10.100.2.20), confirm
       connectivity to sliver-weather (10.100.2.10). Verify weather website
-      loads at http://10.100.1.10 from victim-ws.
+      loads at http://10.100.1.10 from both victim-ws and victim-linux.
 
   - sequence: 2
     delay_minutes: 10
@@ -186,8 +206,9 @@ events:
     delay_minutes: 45
     title: "Phase 6: Observe C2 Callback"
     description: |
-      On c2-operator, observe the Sliver console for a new session
-      from 10.100.0.10. Run 'sessions' to list active sessions.
+      On c2-operator, observe the Sliver console for new sessions
+      from 10.100.0.10 (Windows) and 10.100.0.20 (Linux).
+      Run 'sessions' to list active sessions.
 
   - sequence: 7
     delay_minutes: 50
