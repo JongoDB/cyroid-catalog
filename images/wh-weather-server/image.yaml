@@ -1,0 +1,9 @@
+name: WH Weather Server
+tag: "cyroid/wh-weather-server:latest"
+description: >
+  Watering hole weather frontend with nginx reverse proxy. Dual-homed container
+  that serves a legitimate-looking weather application and proxies C2 callbacks
+  (/api/news/) to a hidden Sliver server on a separate subnet.
+  Includes Node.js, Express, nginx, and Docker.
+arch: x86_64
+category: offensive

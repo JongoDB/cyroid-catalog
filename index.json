@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T21:31:55.550794+00:00"
+    "generated_at": "2026-02-21T23:41:55.964572+00:00"
   },
   "items": [
     {
@@ -102,6 +102,25 @@
       "includes_msel": true,
       "includes_content": true,
       "checksum": "sha256:2ed40eb1c841b4d6"
+    },
+    {
+      "id": "watering-hole-attack",
+      "type": "blueprint",
+      "name": "Watering Hole Attack",
+      "description": "Watering hole attack training scenario featuring:\n- Windows 11 victim client on the user network\n- Compromised weather website (nginx + Express) serving Sliver implants\n- Hidden Sliver C2 server on an isolated subnet\n- Dual-homed weather server bridging user and C2 networks\n\nThe weather server proxies C2 callbacks (/api/news/) to the hidden Sliver\nserver. The Windows client has no direct route to the C2 network, mimicking\nreal-world watering hole infrastructure.\n\nAttack flow: Browse weather site \u2192 Click ad \u2192 Download implant \u2192 C2 callback",
+      "tags": [],
+      "version": "1.0",
+      "path": "blueprints/watering-hole-attack",
+      "requires_images": [
+        "wh-weather-server",
+        "wh-c2-server"
+      ],
+      "requires_base_images": [
+        "windows-11-pro"
+      ],
+      "includes_msel": true,
+      "includes_content": false,
+      "checksum": "sha256:fed77d75334e74ca"
     },
     {
       "id": "watering-hole-attack-amazing",
@@ -273,7 +292,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:4249d3b3e80b7685"
+      "checksum": "sha256:f49919a0a4e61ee2"
     },
     {
       "id": "redteam-firewall",
@@ -456,6 +475,34 @@
       "arch": "x86_64",
       "docker_tag": "cyroid/sliver-weather:latest",
       "checksum": "sha256:be24d36a02c1aa77"
+    },
+    {
+      "id": "wh-c2-server",
+      "type": "image",
+      "name": "WH C2 Server (Sliver)",
+      "description": "Sliver C2 server for the watering hole attack training scenario. Includes Sliver framework, Docker, mingw-w64 for cross-compilation, and the sliver-weather repo for implant build workflows.",
+      "tags": [
+        "offensive"
+      ],
+      "version": "1.0",
+      "path": "images/wh-c2-server",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/wh-c2-server:latest",
+      "checksum": "sha256:cb6742d7cd4ac974"
+    },
+    {
+      "id": "wh-weather-server",
+      "type": "image",
+      "name": "WH Weather Server",
+      "description": "Watering hole weather frontend with nginx reverse proxy. Dual-homed container that serves a legitimate-looking weather application and proxies C2 callbacks (/api/news/) to a hidden Sliver server on a separate subnet. Includes Node.js, Express, nginx, and Docker.",
+      "tags": [
+        "offensive"
+      ],
+      "version": "1.0",
+      "path": "images/wh-weather-server",
+      "arch": "x86_64",
+      "docker_tag": "cyroid/wh-weather-server:latest",
+      "checksum": "sha256:1eb345fc14381a6f"
     },
     {
       "id": "windows-server-2019",
