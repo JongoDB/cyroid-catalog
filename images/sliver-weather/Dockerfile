@@ -33,6 +33,10 @@ ENV NGINX_HTTP_PORT=80
 ENV WEATHER_APP_PORT=5000
 ENV BUILDS_HTTP_PORT=8888
 ENV SYNC_INTERVAL=5
+ENV ELECTRON_APP_URL_WIN=https://github.com/JongoDB/atmos-vision/releases/download/v0.1.0/AtmosVision-Pro-0.1.0-x64.exe
+ENV ELECTRON_APP_URL_MAC=https://github.com/JongoDB/atmos-vision/releases/download/v0.1.0/AtmosVision-Pro-0.1.0-arm64.dmg
+ENV ELECTRON_APP_URL_LINUX=https://github.com/JongoDB/atmos-vision/releases/download/v0.1.0/AtmosVision-Pro-0.1.0-amd64.deb
+ENV ELECTRON_APP_URL_LINUX_RPM=https://github.com/JongoDB/atmos-vision/releases/download/v0.1.0/AtmosVision-Pro-0.1.0-x86_64.rpm
 
 # Install nginx, supervisor, Node.js
 RUN apt-get update && apt-get install -y \
