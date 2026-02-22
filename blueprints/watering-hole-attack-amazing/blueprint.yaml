@@ -66,7 +66,7 @@ vms:
     vm_type: windows_vm
     windows_version: "11"
     arch: x86_64
-    base_image_tag: "dockurr/windows"
+    base_image_tag: "dockurr/windows:latest"
     network_interfaces:
       - network_name: user-space
         ip_address: "10.100.0.10"
