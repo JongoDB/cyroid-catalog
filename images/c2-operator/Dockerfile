@@ -36,16 +36,22 @@ RUN mkdir -p /home/sliver/.sliver /home/sliver/builds \
 
 ENV SLIVER_HTTP_PORT=8080
 ENV SLIVER_AUTOSTART_HTTP=1
+ENV BUILDS_HTTP_PORT=8888
 
-# Entrypoint: fix ownership, auto-start HTTP listener, run sliver-server
+# Entrypoint: fix ownership, auto-start HTTP listener, serve builds, run sliver-server
 RUN printf '%s\n' \
 '#!/bin/sh' \
 'set -e' \
 'SLIVER_HOME="/home/sliver"' \
 ': "${SLIVER_HTTP_PORT:=8080}"' \
 ': "${SLIVER_AUTOSTART_HTTP:=1}"' \
+': "${BUILDS_HTTP_PORT:=8888}"' \
 'mkdir -p "$SLIVER_HOME/.sliver" "$SLIVER_HOME/builds" || true' \
 'chown -R sliver:sliver "$SLIVER_HOME" || true' \
+'' \
+'# Serve builds directory over HTTP for sliver-weather sync' \
+'echo "[entrypoint] Starting builds file server on port $BUILDS_HTTP_PORT ..."' \
+'( cd "$SLIVER_HOME/builds" && python3 -m http.server "$BUILDS_HTTP_PORT" --bind 0.0.0.0 ) &' \
 '' \
 'if [ "$SLIVER_AUTOSTART_HTTP" = "1" ]; then' \
 '  ( sleep 3; gosu sliver /opt/sliver-server http --lhost 0.0.0.0 --lport "$SLIVER_HTTP_PORT" || true ) & ' \
@@ -56,7 +62,10 @@ RUN printf '%s\n' \
 > /usr/local/bin/entrypoint.sh \
  && chmod +x /usr/local/bin/entrypoint.sh
 
+# Install python3 for builds file server
+RUN apt-get update && apt-get install -y --no-install-recommends python3 && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /home/sliver
-EXPOSE 80 443 8080
+EXPOSE 80 443 8080 8888
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD []

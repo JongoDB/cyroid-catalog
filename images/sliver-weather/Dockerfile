@@ -31,6 +31,8 @@ ENV SLIVER_HTTP_PORT=8080
 ENV SLIVER_C2_PATH=/api/news/
 ENV NGINX_HTTP_PORT=80
 ENV WEATHER_APP_PORT=5000
+ENV BUILDS_HTTP_PORT=8888
+ENV SYNC_INTERVAL=5
 
 # Install nginx, supervisor, Node.js
 RUN apt-get update && apt-get install -y \
@@ -69,7 +71,8 @@ COPY nginx.conf.template /etc/nginx/nginx.conf.template
 COPY nginx.tls.conf.template /etc/nginx/nginx.tls.conf.template
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY sync-builds.sh /app/sync-builds.sh
+RUN chmod +x /entrypoint.sh /app/sync-builds.sh
 
 EXPOSE 80 443
 
