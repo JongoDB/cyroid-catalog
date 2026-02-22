@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-21T23:41:55.964572+00:00"
+    "generated_at": "2026-02-22T00:03:41.994793+00:00"
   },
   "items": [
     {
@@ -292,7 +292,7 @@
         "arm64"
       ],
       "docker_tag": "cyroid/kali-attack:latest",
-      "checksum": "sha256:f49919a0a4e61ee2"
+      "checksum": "sha256:4249d3b3e80b7685"
     },
     {
       "id": "redteam-firewall",
