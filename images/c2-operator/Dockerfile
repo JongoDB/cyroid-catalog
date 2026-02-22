@@ -23,9 +23,11 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Download sliver client (for connecting to the C2 server)
-RUN curl -fsSL https://github.com/BishopFox/sliver/releases/latest/download/sliver-client_linux \
-    -o /usr/local/bin/sliver \
+# Download sliver client (arch-aware)
+RUN ARCH=$(uname -m | sed "s/x86_64/amd64/" | sed "s/aarch64/arm64/") \
+    && SLIVER_URL=$(curl -s https://api.github.com/repos/BishopFox/sliver/releases/latest \
+       | jq -r ".assets[] | select(.name | test(\"sliver-client_linux-${ARCH}\")) | .browser_download_url" | head -1) \
+    && curl -fSL -o /usr/local/bin/sliver "$SLIVER_URL" \
     && chmod +x /usr/local/bin/sliver
 
 # Create workspace for operator

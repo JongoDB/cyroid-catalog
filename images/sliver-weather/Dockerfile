@@ -27,9 +27,12 @@ RUN git clone ${SLIVER_WEATHER_REPO} /opt/sliver-weather
 WORKDIR /opt/sliver-weather/weather-app
 RUN npm install && npm run build 2>/dev/null || true
 
-# Download sliver server (latest Linux amd64)
-RUN curl -fsSL https://github.com/BishopFox/sliver/releases/latest/download/sliver-server_linux \
-    -o /usr/local/bin/sliver-server \
+# Install jq for JSON parsing, then download Sliver server (arch-aware)
+RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/* \
+    && ARCH=$(uname -m | sed "s/x86_64/amd64/" | sed "s/aarch64/arm64/") \
+    && SLIVER_URL=$(curl -s https://api.github.com/repos/BishopFox/sliver/releases/latest \
+       | jq -r ".assets[] | select(.name | test(\"sliver-server_linux-${ARCH}\")) | .browser_download_url" | head -1) \
+    && curl -fSL -o /usr/local/bin/sliver-server "$SLIVER_URL" \
     && chmod +x /usr/local/bin/sliver-server
 
 # Generate self-signed TLS certs for nginx
