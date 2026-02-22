@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-22T02:55:26.851761+00:00"
+    "generated_at": "2026-02-22T16:39:37.113579+00:00"
   },
   "items": [
     {
@@ -126,7 +126,7 @@
       "id": "watering-hole-attack-amazing",
       "type": "blueprint",
       "name": "Watering Hole Attack Amazing",
-      "description": "Demonstrates client-side exploitation via a watering hole attack.\nA victim Windows 11 workstation browses to a compromised weather website\n(sliver-weather), downloads a trojanized application containing a Sliver C2\nimplant, which calls back to the listening post. A blue-space Ubuntu operator\nmachine manages the C2 sessions.\n\nPurpose: Train IT staff on how client exploitation works.\n\nAttack Flow:\n1. Victim browses to weather website (watering hole)\n2. Downloads trojanized \"AtmosVision Pro\" installer\n3. Implant executes and calls back to Sliver C2 listening post\n4. Operator manages C2 sessions from blue-space Ubuntu desktop\n\nNetwork Segments:\n- User Space: Corporate victim workstation\n- DMZ: Watering hole website / C2 listening post\n- Blue Space: C2 operator console (isolated management network)\n\nVMs:\n- Windows 11 Pro x86_64 (victim workstation)\n- Sliver-Weather all-in-one (nginx + weather app + Sliver C2)\n- Ubuntu KasmVNC Desktop (C2 operator with Sliver client)",
+      "description": "Demonstrates client-side exploitation via a watering hole attack.\nVictim workstations (Windows 11 and Ubuntu Linux) browse to a compromised\nweather website (sliver-weather), download a trojanized application containing\na Sliver C2 implant, which calls back to the listening post. A blue-space\nUbuntu operator machine manages the C2 sessions.\n\nPurpose: Train IT staff on how client exploitation works.\n\nAttack Flow:\n1. Victim browses to weather website (watering hole)\n2. Downloads trojanized \"AtmosVision Pro\" installer\n3. Implant executes and calls back to Sliver C2 listening post\n4. Operator manages C2 sessions from blue-space Ubuntu desktop\n\nNetwork Segments:\n- User Space: Corporate victim workstations (Windows + Linux)\n- DMZ: Watering hole website / C2 listening post\n- Blue Space: C2 operator console (isolated management network)\n\nVMs:\n- Windows 11 Pro x86_64 (victim workstation)\n- Ubuntu Desktop (Linux victim workstation)\n- Sliver-Weather all-in-one (nginx + weather app + Sliver C2)\n- Ubuntu KasmVNC Desktop (C2 operator with Sliver client)",
       "tags": [],
       "version": "1.0",
       "path": "blueprints/watering-hole-attack-amazing",
@@ -139,7 +139,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:4876050708f1c8d6"
+      "checksum": "sha256:c46457a0628fd9d6"
     },
     {
       "id": "apt-intrusion",
