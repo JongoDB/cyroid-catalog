@@ -109,6 +109,12 @@ vms:
     cpu: 2
     ram_mb: 4096
     disk_gb: 20
+    environment:
+      USE_TLS: "true"
+      DOMAIN: "weather-server"
+      SLIVER_C2_HOST: "10.100.2.20"
+      SLIVER_HTTP_PORT: "8080"
+      SLIVER_C2_PATH: "/api/news/"
     position_x: 400
     position_y: 150
 
