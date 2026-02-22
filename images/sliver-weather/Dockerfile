@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     iproute2 \
     zip \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -65,11 +66,12 @@ RUN rm -f /etc/nginx/sites-enabled/default
 
 # Copy our configs
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nginx.tls.conf.template /etc/nginx/nginx.tls.conf.template
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 80
+EXPOSE 80 443
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
