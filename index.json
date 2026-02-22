@@ -3,7 +3,7 @@
     "name": "Official CYROID Catalog",
     "version": "0.1.0",
     "maintainer": "JongoDB",
-    "generated_at": "2026-02-22T00:16:55.343700+00:00"
+    "generated_at": "2026-02-22T02:55:26.851761+00:00"
   },
   "items": [
     {
@@ -139,7 +139,7 @@
       ],
       "includes_msel": true,
       "includes_content": true,
-      "checksum": "sha256:8f156bb1d37b0144"
+      "checksum": "sha256:4876050708f1c8d6"
     },
     {
       "id": "apt-intrusion",
@@ -184,8 +184,8 @@
     {
       "id": "c2-operator",
       "type": "image",
-      "name": "C2 Operator Console",
-      "description": "Ubuntu KasmVNC desktop pre-configured for C2 operations.\nIncludes the Sliver client, network analysis tools, and a\ndesktop quickstart guide for connecting to a Sliver C2 server.\n\nPre-installed tools:\n- Sliver client (for C2 session management)\n- nmap, tcpdump, tshark, Wireshark\n- curl, wget, dnsutils, whois\n- Python 3, SSH client\n\nUse with the sliver-weather listening post image.",
+      "name": "C2 Operator (Sliver Server)",
+      "description": "Sliver C2 server with auto-start HTTP listener.\nBased on the sliver service from the sliver-weather training lab.\n\nAuto-starts an HTTP C2 listener on SLIVER_HTTP_PORT (default 8080).\nDesigned to receive proxied C2 traffic from the weather frontend's\nnginx reverse proxy.\n\nEnvironment variables:\n- SLIVER_HTTP_PORT: HTTP listener port (default: 8080)\n- SLIVER_AUTOSTART_HTTP: Set to 0 to disable auto-start (default: 1)",
       "tags": [
         "c2"
       ],
@@ -193,7 +193,7 @@
       "path": "images/c2-operator",
       "arch": "x86_64",
       "docker_tag": "cyroid/c2-operator:latest",
-      "checksum": "sha256:323f2d8a8205b4c6"
+      "checksum": "sha256:611d16cd490ac7a5"
     },
     {
       "id": "ics-eng-workstation",
@@ -474,7 +474,7 @@
       "path": "images/sliver-weather",
       "arch": "x86_64",
       "docker_tag": "cyroid/sliver-weather:latest",
-      "checksum": "sha256:be24d36a02c1aa77"
+      "checksum": "sha256:475ccb68b0a933c2"
     },
     {
       "id": "wh-c2-server",
